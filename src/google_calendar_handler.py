@@ -1,6 +1,8 @@
+"""This module handles requests to the Google Calendar API."""
+
 from typing import Optional
-from datetime import datetime
-import os.path
+from datetime import datetime, timedelta
+from os.path import exists
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -9,20 +11,30 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from calendar_handler import CalendarHandler
 
-SCOPES = ["https://www.googleapis.com/auth/calendar"]
-SERVICE_ACCOUNT_FILE = "credentials.json"  # Replace with your credentials file
-
 
 class GoogleCalendarHandler(CalendarHandler):
-    """Handles requests to the Google Calendar API"""
+    """Handles requests to the Google Calendar API
 
-    def __init__(self):
+    Args:
+        scopes (list): The scopes to request access to.
+        token_file_path (str): The path to the file to store the
+        token in.
+        service_account_file_path (str): The path to the service
+        account file.
+    """
+
+    def __init__(
+        self,
+        scopes: list,
+        token_file_path: str,
+        service_account_file_path: str,
+    ):
         creds: None | Credentials = None
 
-        if os.path.exists("token.json"):
+        if exists(token_file_path):
             creds = Credentials.from_authorized_user_file(
-                "token.json",
-                SCOPES,
+                token_file_path,
+                scopes,
             )
 
         if not creds or not creds.valid:
@@ -30,12 +42,12 @@ class GoogleCalendarHandler(CalendarHandler):
                 creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    "credentials.json", SCOPES
+                    service_account_file_path, scopes
                 )
                 creds = flow.run_local_server(port=0)
 
             # Save the credentials for the next run
-            with open("token.json", "w") as token:
+            with open(token_file_path, "w") as token:
                 token.write(creds.to_json())
 
         self._service = build("calendar", "v3", credentials=creds)
@@ -48,15 +60,26 @@ class GoogleCalendarHandler(CalendarHandler):
         end_datetime: datetime,
         location: Optional[str] = None,
         calendar_id: Optional[str] = "primary",
-    ) -> str:
+    ) -> Optional[str]:
         """Add an event to the calendar.
 
-        Adds an event to the calendar with the given summary, description,
-        start and end times, and location.
+        Adds an event to the calendar with the given summary,
+        description, start and end times, and location.
 
         Args:
+            summary (str): The summary of the event.
+            description (str): The description of the event.
+            start_datetime (datetime): The start time of the event.
+            end_datetime (datetime): The end time of the event.
+            location (str): The location of the event.
+            calendar_id (str): The ID of the calendar to add the 
+            event to.
+
+        Returns:
+            str: The ID of the event that was added.
         """
-        event: dict = {
+
+        event_to_add: dict = {
             "summary": summary,
             "location": location,
             "description": description,
@@ -70,52 +93,81 @@ class GoogleCalendarHandler(CalendarHandler):
             },
         }
 
-        event: dict = (
+        added_event = (
             self._service.events()
             .insert(
                 calendarId=calendar_id,
-                body=event,
+                body=event_to_add,
             )
             .execute()
         )
-        event_id: str = event.get("id")
+        event_id: str = added_event.get("id")
         return event_id
 
-    def get_event_by_id(self, event_id: str) -> dict:
+    def get_event_by_id(
+        self,
+        event_id: str,
+        calendar_id: str = "primary",
+    ) -> dict:
         """Get an event by its ID.
 
         Args:
             event_id (str): The ID of the event to retrieve.
+            calendar_id (str): The ID of the calendar to retrieve the
+            event from.
+            calendar_id (str): The ID of the calendar to retrieve the
+            event from.
 
         Returns:
             dict: The event details.
         """
+
         try:
             event: dict = (
                 self._service.events()
-                .get(calendarId="primary", eventId=event_id)
+                .get(calendarId=calendar_id, eventId=event_id)
                 .execute()
             )
             return event
+
         except HttpError as e:
             print(f"An error occurred: {e}")
-            return None
+            return {}
 
-    def delete_event_by_id(self, event_id):
+    def delete_event_by_id(
+        self,
+        event_id: str,
+        calendar_id: str = "primary",
+    ) -> dict:
         """Delete an event by its ID.
 
         Args:
             event_id (str): The ID of the event to delete.
+            calendar_id (str): The ID of the calendar to delete the 
+            event from.
+
+        Returns:
+            dict: The event details.
         """
+
         try:
-            self._service.events().delete(
-                calendarId="primary", eventId=event_id
-            ).execute()
-            print(f"Event with ID {event_id} has been deleted.")
+            event: dict = (
+                self._service.events()
+                .delete(calendarId=calendar_id, eventId=event_id)
+                .execute()
+            )
+            return event
+
         except HttpError as e:
             print(f"An error occurred: {e}")
+            return {}
 
-    def update_event_color(self, event_id, color_id):
+    def update_event_color(
+        self,
+        event_id,
+        color_id,
+        calendar_id="primary",
+    ) -> dict:
         """Update the color of an event.
 
         Args:
@@ -123,38 +175,41 @@ class GoogleCalendarHandler(CalendarHandler):
             color_id (str): The ID of the color to use.
         """
         try:
-            event = (
+            event: dict = (
                 self._service.events()
-                .get(calendarId="primary", eventId=event_id)
+                .get(calendarId=calendar_id, eventId=event_id)
                 .execute()
             )
             event["colorId"] = color_id
-            updated_event = (
+            updated_event: dict = (
                 self._service.events()
-                .update(calendarId="primary", eventId=event_id, body=event)
+                .update(calendarId=calendar_id, eventId=event_id, body=event)
                 .execute()
             )
-            print(f"Event color updated to {color_id}.")
+
             return updated_event
+
         except HttpError as e:
             print(f"An error occurred: {e}")
-            return None
+            return {}
 
-    def get_todays_events(self) -> list:
+    def get_todays_events(self, calendar_id: str = "primary") -> list:
         """Get today's events from the calendar.
+
+        Args:
+            calendar_id (str): The ID of the calendar to retrieve 
+            events from.
 
         Returns:
             list: A list of events for today.
         """
-        now = datetime.datetime.utcnow().isoformat() + "Z"
-        tomorrow = (
-            datetime.datetime.utcnow() + datetime.timedelta(days=1)
-        ).isoformat() + "Z"
+        now: str = datetime.utcnow().isoformat() + "Z"
+        tomorrow: str = (datetime.utcnow() + timedelta(days=1)).isoformat() + "Z"
 
-        events_result = (
+        events_result: dict = (
             self._service.events()
             .list(
-                calendarId="primary",
+                calendarId=calendar_id,
                 timeMin=now,
                 timeMax=tomorrow,
                 singleEvents=True,
