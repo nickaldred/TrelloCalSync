@@ -10,3 +10,7 @@
 - Add event
 - Delete an event
 - Get an event
+
+## Board Handler
+
+- 
