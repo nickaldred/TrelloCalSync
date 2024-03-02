@@ -1,0 +1,5 @@
+/venv/
+*tempCodeRunnerFile.py
+credentials.json
+token.json
+/.mypy_cache/
