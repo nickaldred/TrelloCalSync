@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 from typing import List
+from data_models import BoardCard, BoardList, Board
 
 
 class BoardHandler(ABC):
@@ -19,7 +20,7 @@ class BoardHandler(ABC):
         """
 
     @abstractmethod
-    def get_cards_in_list(self, board_id: str, list_id: str) -> List:
+    def get_cards_in_list(self, board_id: str, list_id: str) -> List[BoardCard]:
         """
         Get the cards in a specific list.
 
@@ -32,7 +33,7 @@ class BoardHandler(ABC):
         """
 
     @abstractmethod
-    def get_all_boards(self) -> List:
+    def get_all_boards(self) -> List[Board]:
         """
         Get all the boards.
 
@@ -41,7 +42,7 @@ class BoardHandler(ABC):
         """
 
     @abstractmethod
-    def get_all_lists(self, board_id: str) -> List:
+    def get_all_lists(self, board_id: str) -> List[BoardList]:
         """
         Get all the lists in a board.
 
@@ -53,7 +54,7 @@ class BoardHandler(ABC):
         """
 
     @abstractmethod
-    def update_card_list(self, card_id: str, new_list_id: str):
+    def update_card_list(self, card_id: str, new_list_id: str) -> BoardCard:
         """
         Update the list of a card.
 
