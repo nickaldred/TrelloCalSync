@@ -14,7 +14,13 @@ from data_models import BoardCard, BoardList, Board
 
 
 class TrelloHandler(BoardHandler):
-    """Handles all interactions with the Trello API."""
+    """Handles all interactions with the Trello API.
+
+    Args:
+        api_key: The API key for the Trello API.
+        api_secret: The API secret for the Trello API.
+        token: The token for the Trello API.
+    """
 
     def __init__(self, api_key: str, api_secret: str, token: str):
         self.client = TrelloClient(
