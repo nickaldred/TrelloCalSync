@@ -3,8 +3,14 @@ This module contains the TrelloHandler class, which is responsible
 for all interactions with the Trello API.
 """
 
-from trello import Card, TrelloClient, Board, List as TrelloList
+from trello import (
+    Card as TrelloCard,
+    TrelloClient,
+    Board as TrelloBoard,
+    List as TrelloList,
+)
 from board_handler import BoardHandler
+from data_models import BoardCard, BoardList, Board
 
 
 class TrelloHandler(BoardHandler):
@@ -17,7 +23,11 @@ class TrelloHandler(BoardHandler):
             token=token,
         )
 
-    def get_cards_in_list(self, board_id: str, list_id: str) -> list[Card]:
+    def get_cards_in_list(
+        self,
+        board_id: str,
+        list_id: str,
+    ) -> list[BoardCard]:
         """Gets all cards within a specific list (column) on a board.
 
         Args:
@@ -28,9 +38,18 @@ class TrelloHandler(BoardHandler):
             A list of all cards in the list.
         """
 
-        board: Board = self.client.get_board(board_id)
+        board: TrelloBoard = self.client.get_board(board_id)
         target_list: TrelloList = board.get_list(list_id)
-        return target_list.list_cards()
+        trello_cards = target_list.list_cards()
+        return [
+            BoardCard(
+                id=card.id,
+                name=card.name,
+                desc=card.desc,
+                list_id=list_id,
+            )
+            for card in trello_cards
+        ]
 
     def get_all_boards(self) -> list[Board]:
         """Gets the IDs of all boards accessible to the user.
@@ -38,10 +57,17 @@ class TrelloHandler(BoardHandler):
         Returns:
             A list of all boards accessible to the user.
         """
+        trello_boards = self.client.list_boards()
+        return [
+            Board(
+                id=board.id,
+                name=board.name,
+                closed=board.closed,
+            )
+            for board in trello_boards
+        ]
 
-        return self.client.list_boards()
-
-    def get_all_lists(self, board_id: str) -> list[TrelloList]:
+    def get_all_lists(self, board_id: str) -> list[BoardList]:
         """Gets the IDs of all lists on a specific board.
 
         Args:
@@ -51,10 +77,19 @@ class TrelloHandler(BoardHandler):
             A list of all lists on the board.
         """
 
-        board: Board = self.client.get_board(board_id)
-        return board.list_lists()
+        board: TrelloBoard = self.client.get_board(board_id)
+        trello_lists = board.list_lists()
+        return [
+            BoardList(
+                id=list.id,
+                name=list.name,
+                closed=list.closed,
+                board_id=board_id,
+            )
+            for list in trello_lists
+        ]
 
-    def update_card_list(self, card_id: str, new_list_id: str) -> Card:
+    def update_card_list(self, card_id: str, new_list_id: str) -> BoardCard:
         """Moves a card to a different list (column).
 
         Args:
@@ -64,8 +99,9 @@ class TrelloHandler(BoardHandler):
         Returns:
             The updated card.
         """
-
-        card: Card = self.client.get_card(card_id)
+        card: TrelloCard = self.client.get_card(card_id)
         new_list: TrelloList = self.client.get_list(new_list_id)
         card.change_list(new_list.id)
-        return card
+        return BoardCard(
+            id=card.id, name=card.name, desc=card.desc, list_id=new_list.id
+        )
