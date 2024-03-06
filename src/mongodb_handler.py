@@ -1,5 +1,11 @@
+"""Handles all MongoDB operations."""
+
+from typing import Any
 from pymongo import MongoClient
+from pymongo.collection import Collection
 from pymongo.database import Database
+from pymongo.results import DeleteResult, UpdateResult
+from pymongo.errors import PyMongoError
 
 
 class MongoDBHandler:
@@ -14,6 +20,7 @@ class MongoDBHandler:
             port (int): The port of the MongoDB server.
             db_name (str): The name of the database to connect to.
         """
+
         self.client: MongoClient = MongoClient(host, port)
         self.db: Database = self.client[db_name]
 
@@ -27,10 +34,12 @@ class MongoDBHandler:
         Returns:
             bool: True if successful, False otherwise.
         """
+
         try:
             self.db.create_collection(collection_name)
             return True
-        except Exception as e:
+
+        except PyMongoError as e:
             print(f"An error occurred: {e}")
             return False
 
@@ -45,11 +54,13 @@ class MongoDBHandler:
         Returns:
             bool: True if successful, False otherwise.
         """
+
         try:
-            collection = self.db[collection_name]
-            print(collection.insert_one(document))
+            collection: Collection = self.db[collection_name]
+            collection.insert_one(document)
             return True
-        except Exception as e:
+
+        except PyMongoError as e:
             print(f"An error occurred: {e}")
             return False
 
@@ -67,11 +78,14 @@ class MongoDBHandler:
         Returns:
             bool: True if successful, False otherwise.
         """
+
         try:
-            collection = self.db[collection_name]
-            result = collection.update_one(query, {"$set": new_values})
+            collection: Collection = self.db[collection_name]
+            result: UpdateResult = (
+                collection.update_one(query, {"$set": new_values}))
             return result.modified_count > 0
-        except Exception as e:
+
+        except PyMongoError as e:
             print(f"An error occurred: {e}")
             return False
 
@@ -86,11 +100,13 @@ class MongoDBHandler:
         Returns:
             bool: True if successful, False otherwise.
         """
+
         try:
-            collection = self.db[collection_name]
-            result = collection.delete_one(query)
+            collection: Collection = self.db[collection_name]
+            result: DeleteResult = collection.delete_one(query)
             return result.deleted_count > 0
-        except Exception as e:
+
+        except PyMongoError as e:
             print(f"An error occurred: {e}")
             return False
 
@@ -105,15 +121,16 @@ class MongoDBHandler:
         Returns:
             bool: True if successful, False otherwise.
         """
+
         try:
-            collection = self.db[collection_name]
+            collection: Collection = self.db[collection_name]
             collection.create_index(field_name)
             return True
-        except Exception as e:
+        except PyMongoError as e:
             print(f"An error occurred: {e}")
             return False
-        
-    def get_document(self, collection_name: str, query: dict) -> dict:
+
+    def get_document(self, collection_name: str, query: dict) -> Any:
         """
         Get a document from a collection.
 
@@ -124,23 +141,11 @@ class MongoDBHandler:
         Returns:
             dict: The document if found, None otherwise.
         """
+
         try:
-            collection = self.db[collection_name]
-            return collection.find_one(query)
-        except Exception as e:
+            collection: Collection = self.db[collection_name]
+            document = collection.find_one(query)
+            return document
+        except PyMongoError as e:
             print(f"An error occurred: {e}")
-            return None
-
-
-
-test = MongoDBHandler('localhost', 27017, 'test')
-
-test_data = {"board_id": "3", "cal_id": "3", "event_title": "test_event"}
-
-# print(test.add_document('test_collection', test_data))
-
-
-# test.create_index('test_collection', 'board_id')
-# test.create_index('test_collection', 'cal_id')
-
-print(test.get_document('test_collection', {'board_id': '3'}))
+            return {}
