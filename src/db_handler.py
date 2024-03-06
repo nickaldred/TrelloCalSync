@@ -8,22 +8,30 @@ class DBHandler(ABC):
 
     @abstractmethod
     def add_collection(self, collection_name: str) -> bool:
-        pass
+        """Create a new collection in the database."""
 
     @abstractmethod
     def add_document(self, collection_name: str, document: dict) -> bool:
-        pass
+        """Add a new document to the specified collection in the
+        database.
+        """
 
     @abstractmethod
     def update_document(
         self, collection_name: str, query: dict, new_values: dict
     ) -> bool:
-        pass
+        """Update a document in the specified collection in the
+        database.
+        """
 
     @abstractmethod
     def delete_document(self, collection_name: str, query: dict) -> bool:
-        pass
+        """Delete a document from the specified collection in the
+        database.
+        """
 
     @abstractmethod
     def create_index(self, collection_name: str, field_name: str) -> bool:
-        pass
+        """Create an index on a field in the specified collection in
+        the database.
+        """
