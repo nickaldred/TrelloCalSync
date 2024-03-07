@@ -8,7 +8,7 @@ from pymongo.results import DeleteResult, UpdateResult
 from pymongo.errors import PyMongoError
 
 
-class MongoDBHandler:
+class MongoDbHandler:
     """Handles all MongoDB operations."""
 
     def __init__(self, host: str, port: int, db_name: str):
