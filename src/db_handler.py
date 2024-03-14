@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 
 
-class DBHandler(ABC):
+class DbHandler(ABC):
     """Abstract base class for database handlers."""
 
     @abstractmethod
