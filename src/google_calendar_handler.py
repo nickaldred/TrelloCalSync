@@ -72,7 +72,7 @@ class GoogleCalendarHandler(CalendarHandler):
             start_datetime (datetime): The start time of the event.
             end_datetime (datetime): The end time of the event.
             location (str): The location of the event.
-            calendar_id (str): The ID of the calendar to add the 
+            calendar_id (str): The ID of the calendar to add the
             event to.
 
         Returns:
@@ -143,7 +143,7 @@ class GoogleCalendarHandler(CalendarHandler):
 
         Args:
             event_id (str): The ID of the event to delete.
-            calendar_id (str): The ID of the calendar to delete the 
+            calendar_id (str): The ID of the calendar to delete the
             event from.
 
         Returns:
@@ -151,12 +151,10 @@ class GoogleCalendarHandler(CalendarHandler):
         """
 
         try:
-            event: dict = (
-                self._service.events()
-                .delete(calendarId=calendar_id, eventId=event_id)
-                .execute()
-            )
-            return event
+            self._service.events().delete(
+                calendarId=calendar_id, eventId=event_id
+            ).execute()
+            return {"status": "Event deleted successfully"}
 
         except HttpError as e:
             print(f"An error occurred: {e}")
@@ -197,14 +195,16 @@ class GoogleCalendarHandler(CalendarHandler):
         """Get today's events from the calendar.
 
         Args:
-            calendar_id (str): The ID of the calendar to retrieve 
+            calendar_id (str): The ID of the calendar to retrieve
             events from.
 
         Returns:
             list: A list of events for today.
         """
         now: str = datetime.utcnow().isoformat() + "Z"
-        tomorrow: str = (datetime.utcnow() + timedelta(days=1)).isoformat() + "Z"
+        tomorrow: str = (
+            datetime.utcnow() + timedelta(days=1)
+        ).isoformat() + "Z"
 
         events_result: dict = (
             self._service.events()
