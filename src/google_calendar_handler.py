@@ -10,6 +10,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from calendar_handler import CalendarHandler
+from googleapiclient.http import BatchHttpRequest
 
 
 class GoogleCalendarHandler(CalendarHandler):
@@ -218,6 +219,34 @@ class GoogleCalendarHandler(CalendarHandler):
             .execute()
         )
         return events_result.get("items", [])
+
+    def get_events_by_ids(self, event_ids: list, calendar_id: str = "primary") -> list:
+        """Get events by their IDs.
+
+        Args:
+            event_ids (list[str]): The IDs of the events to retrieve.
+            calendar_id (str): The ID of the calendar to retrieve the
+
+        Returns:
+            list[dict]: The event details.
+        """
+
+        def callback(request_id, response, exception):
+            if exception is not None:
+                print(f"An error occurred: {exception}")
+            else:
+                calendar_events.append(response)
+
+        calendar_events: list = []
+        batch = self._service.new_batch_http_request(callback=callback)
+        for event_id in event_ids:
+            batch.add(
+                self._service.events().get(
+                    calendarId=calendar_id, eventId=event_id
+                )
+            )
+        batch.execute()
+        return calendar_events
 
 
 # # Example usage

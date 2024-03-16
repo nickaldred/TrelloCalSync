@@ -3,6 +3,7 @@
 from google_calendar_handler import GoogleCalendarHandler
 from mongodb_handler import MongoDbHandler
 from trello_handler import TrelloHandler
+from exceptions import SyncError
 
 
 class SyncProcessor:
@@ -23,6 +24,13 @@ class SyncProcessor:
     ):
         """Syncs the calendar with the board events"""
 
+        events = self.db_handler.get_collection("calendar_events")
+
+        if not events:
+            raise SyncError
+        
+        
+
         # get board events
         # get calendar events
         # check they match
@@ -39,3 +47,6 @@ class SyncProcessor:
 
     def sync_up_events(self):
         """Syncs up the out of sync board and calendar events."""
+
+
+
