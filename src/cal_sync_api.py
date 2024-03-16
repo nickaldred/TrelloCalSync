@@ -75,6 +75,7 @@ class Event(BaseModel):
     trello_card_id: str
     trello_board_id: str
     event_id: Optional[str] = None
+    created_at: datetime = datetime.now()
 
 
 @app.post("/add_event")
