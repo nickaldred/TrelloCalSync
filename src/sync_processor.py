@@ -1,13 +1,24 @@
 """Syncs the board and calendar."""
 
+from google_calendar_handler import GoogleCalendarHandler
+from mongodb_handler import MongoDbHandler
+from trello_handler import TrelloHandler
+
 
 class SyncProcessor:
     """Syncs the board and calendar"""
 
-    def __init(self):
-        pass
+    def __init__(
+        self,
+        calendar_handler: GoogleCalendarHandler,
+        db_handler: MongoDbHandler,
+        board_handler: TrelloHandler,
+    ):
+        self.calendar_handler: GoogleCalendarHandler = calendar_handler
+        self.db_handler: MongoDbHandler = db_handler
+        self.board_handler: TrelloHandler = board_handler
 
-    def sync_calendar(
+    def sync(
         self,
     ):
         """Syncs the calendar with the board events"""
