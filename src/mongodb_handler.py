@@ -149,3 +149,20 @@ class MongoDbHandler:
         except PyMongoError as e:
             print(f"An error occurred: {e}")
             return {}
+
+    def get_collection(self, collection_name: str) -> Collection:
+        """
+        Get a collection from the database.
+
+        Args:
+            collection_name (str): The name of the collection.
+
+        Returns:
+            Collection: The collection if found, None otherwise.
+        """
+        try:
+            collection: Collection = self.db[collection_name]
+            return collection
+        except PyMongoError as e:
+            print(f"An error occurred: {e}")
+            return None
