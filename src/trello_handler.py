@@ -111,3 +111,20 @@ class TrelloHandler(BoardHandler):
         return BoardCard(
             id=card.id, name=card.name, desc=card.desc, list_id=new_list.id
         )
+
+    def get_card(self, card_id: str) -> BoardCard:
+        """Gets a card by its ID.
+
+        Args:
+            card_id: The ID of the card to get.
+
+        Returns:
+            The card with the given ID.
+        """
+        card: TrelloCard = self.client.get_card(card_id)
+        return BoardCard(
+            id=card.id,
+            name=card.name,
+            desc=card.desc,
+            list_id=card.idList,
+        )

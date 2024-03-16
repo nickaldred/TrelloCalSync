@@ -27,8 +27,8 @@ class Event(BaseModel):
     end_datetime: datetime
     location: Optional[str] = None
     calendar_id: str = "primary"
-    trello_card_id: str
-    trello_board_id: str
+    card_id: str
+    board_id: str
     event_id: Optional[str] = None
     created_at: datetime = datetime.now()
 

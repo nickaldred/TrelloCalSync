@@ -81,8 +81,9 @@ class MongoDbHandler:
 
         try:
             collection: Collection = self.db[collection_name]
-            result: UpdateResult = (
-                collection.update_one(query, {"$set": new_values}))
+            result: UpdateResult = collection.update_one(
+                query, {"$set": new_values}
+            )
             return result.modified_count > 0
 
         except PyMongoError as e:
@@ -150,19 +151,21 @@ class MongoDbHandler:
             print(f"An error occurred: {e}")
             return {}
 
-    def get_collection(self, collection_name: str) -> Collection:
+    def get_all_documents(self, collection_name: str) -> list:
         """
-        Get a collection from the database.
+        Get all documents from a collection.
 
         Args:
             collection_name (str): The name of the collection.
 
         Returns:
-            Collection: The collection if found, None otherwise.
+            list: A list of all documents in the collection, empty list
+            if collection is empty or an error occurs.
         """
         try:
             collection: Collection = self.db[collection_name]
-            return collection
+            documents = list(collection.find())
+            return documents
         except PyMongoError as e:
             print(f"An error occurred: {e}")
-            return None
+            return []
