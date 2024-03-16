@@ -220,7 +220,9 @@ class GoogleCalendarHandler(CalendarHandler):
         )
         return events_result.get("items", [])
 
-    def get_events_by_ids(self, event_ids: list, calendar_id: str = "primary") -> list:
+    def get_events_by_ids(
+        self, event_ids: list, calendar_id: str = "primary"
+    ) -> dict:
         """Get events by their IDs.
 
         Args:
@@ -228,22 +230,25 @@ class GoogleCalendarHandler(CalendarHandler):
             calendar_id (str): The ID of the calendar to retrieve the
 
         Returns:
-            list[dict]: The event details.
+            dict: A dictionary of events, with the event IDs as keys.
         """
 
         def callback(request_id, response, exception):
             if exception is not None:
                 print(f"An error occurred: {exception}")
             else:
-                calendar_events.append(response)
+                calendar_events[request_id] = response
 
-        calendar_events: list = []
-        batch = self._service.new_batch_http_request(callback=callback)
+        calendar_events: dict = {}
+        batch: BatchHttpRequest = self._service.new_batch_http_request(
+            callback=callback
+        )
         for event_id in event_ids:
             batch.add(
                 self._service.events().get(
                     calendarId=calendar_id, eventId=event_id
-                )
+                ),
+                request_id=event_id,
             )
         batch.execute()
         return calendar_events
