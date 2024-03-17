@@ -1,10 +1,14 @@
 """Factory functions for creating handlers."""
 
+from os import environ
 from typing import Optional
+from dotenv import load_dotenv
 from exceptions import FactoryError
 from google_calendar_handler import GoogleCalendarHandler
 from mongodb_handler import MongoDbHandler
 from trello_handler import TrelloHandler
+
+load_dotenv("./.env")
 
 
 def calendar_handler_factory(
@@ -43,3 +47,22 @@ def db_handler_factory(type_of_handler: str) -> Optional[MongoDbHandler]:
         return MongoDbHandler(host="localhost", port=27017, db_name="cal_sync")
     else:
         raise FactoryError("Invalid database handler type")
+
+
+def board_handler_factory(type_of_handler: str) -> Optional[TrelloHandler]:
+    """Create a board handler.
+
+    Args:
+        type_of_handler (str): The type of board handler to create.
+
+    Returns:
+        TrelloHandler: The board handler.
+    """
+    if type_of_handler == "trello":
+        return TrelloHandler(
+            api_key=environ["board_api_key"],
+            api_secret=environ["board_api_secret"],
+            token=environ["board_token"],
+        )
+    else:
+        raise FactoryError("Invalid board handler type")
