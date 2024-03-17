@@ -10,6 +10,7 @@ class BoardCard:
     name: str
     desc: str
     list_id: str
+    board_id: str
 
 
 @dataclass

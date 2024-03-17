@@ -117,6 +117,7 @@ class TrelloHandler(BoardHandler):
                 name=card.name,
                 desc=card.desc,
                 list_id=list_id,
+                board_id=board_id,
             )
             for card in trello_cards
         ]
@@ -191,4 +192,5 @@ class TrelloHandler(BoardHandler):
             name=card.name,
             desc=card.desc,
             list_id=card.idList,
+            board_id=card.idBoard,
         )
