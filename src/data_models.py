@@ -20,7 +20,7 @@ class BoardList:
     name: str
     closed: bool
     board_id: str
-   
+
 
 @dataclass
 class Board:
