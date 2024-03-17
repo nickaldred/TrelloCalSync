@@ -174,7 +174,11 @@ class TrelloHandler(BoardHandler):
         new_list: TrelloList = self.client.get_list(new_list_id)
         card.change_list(new_list.id)
         return BoardCard(
-            id=card.id, name=card.name, desc=card.desc, list_id=new_list.id
+            id=card.id,
+            name=card.name,
+            desc=card.desc,
+            list_id=new_list.id,
+            board_id=card.idBoard,
         )
 
     def get_card(self, card_id: str) -> BoardCard:
