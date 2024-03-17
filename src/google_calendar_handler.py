@@ -252,20 +252,3 @@ class GoogleCalendarHandler(CalendarHandler):
             )
         batch.execute()
         return calendar_events
-
-
-# # Example usage
-# calendar_api = GoogleCalendarHandler()
-
-# # Add an event
-# summary = "Important Meeting"
-# description = "Discuss project roadmap"
-# start_time = datetime.datetime(2024, 2, 29, 10, 0, 0)
-# end_time = datetime.datetime(2024, 2, 29, 11, 30, 0)
-# # event_id = calendar_api.add_event(summary, description, start_time, end_time)
-
-# print(calendar_api.get_todays_events())
-
-# calendar_api.update_event_color("0aj2luk39siehndnj0n3pl0dif", 2)
-
-# # calendar_api.delete_event_by_id("2e5usct0g52kng5ao3m0et08cf")
