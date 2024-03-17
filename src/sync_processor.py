@@ -24,15 +24,22 @@ class SyncProcessor:
     ):
         """Syncs the calendar with the board events"""
 
-        events = self.db_handler.self.db_handler.get_all_documents(
+        events: dict = self.db_handler.self.db_handler.get_all_documents(
             "calendar_events"
         )
 
         if not events:
-            raise SyncError
+            raise SyncError("No events found")
 
-        # get board events
-        # get calendar events
+        board_events: dict = self.get_board_events(events)
+        calendar_events: dict = self.get_calendar_events(events)
+
+        if not board_events or not calendar_events:
+            raise SyncError("No events found")
+
+        events_to_sync: list = self.compare_events(
+            board_events, calendar_events, events
+        )
         # check they match
         # make any adjustments
 
@@ -63,8 +70,14 @@ class SyncProcessor:
         )
         return calendar_events
 
-    def compare_events(self):
+    def compare_events(
+        self, board_events: dict, calendar_events: dict, events: list[dict]
+    ) -> list:
         """Compares the events to check if they are in sync."""
+
+        events_to_sync: list = []
+
+        return events_to_sync
 
     def sync_up_events(self):
         """Syncs up the out of sync board and calendar events."""
