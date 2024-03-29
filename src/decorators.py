@@ -36,6 +36,7 @@ def log_decorator(func):
             extra={
                 "time_stamp": datetime.now(),
                 "item_id": item_id,
+                "log_level": "INFO",
                 "function_name": func.__name__,
             },
         )
@@ -45,6 +46,7 @@ def log_decorator(func):
             extra={
                 "time_stamp": datetime.now(),
                 "item_id": item_id,
+                "log_level": "INFO",
                 "function_name": func.__name__,
             },
         )
@@ -57,24 +59,26 @@ def debug_log_decorator(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         item_id = kwargs.pop("item_id", None)
-        logger.info(
+        logger.debug(
             {
                 "event": "execution_started",
             },
             extra={
                 "time_stamp": datetime.now(),
                 "item_id": item_id,
+                "log_level": "DEBUG",
                 "function_name": func.__name__,
             },
         )
         result = func(*args, **kwargs)
-        logger.info(
+        logger.debug(
             {
                 "event": "execution_ended",
             },
             extra={
                 "time_stamp": datetime.now(),
                 "item_id": item_id,
+                "log_level": "DEBUG",
                 "function_name": func.__name__,
             },
         )
@@ -83,11 +87,28 @@ def debug_log_decorator(func):
     return wrapper
 
 
+def log_error(message, error_type, item_id=None):
+    logger.error(
+        message,
+        extra={
+            "time_stamp": datetime.now(),
+            "item_id": item_id,
+            "log_level": "ERROR",
+            "error_type": error_type,
+            "function_name": "log_error",
+        },
+    )
+
+
 @log_decorator
-def test():
+def test(item_id=None):
 
-    result = 1 + 2
-    return result
+    try:
+        result = 1 + 2
+        raise KeyError
+    except KeyError as e:
+        log_error("KeyError occurred", error_type="KeyError", item_id=item_id)
+        raise e
 
 
-print(test())
+print(test(item_id=3))
