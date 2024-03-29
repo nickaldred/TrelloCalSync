@@ -74,9 +74,9 @@ class SyncProcessor:
             if event_id not in calendar_events:
                 events_to_sync.append(event)
             else:
-                if not self._config.status[event["current_status"]] == int(
-                    calendar_events[event_id]["colorId"]
-                ):
+                if not self._config.get_status_colour_id(
+                    event["current_status"]
+                ) == int(calendar_events[event_id]["colorId"]):
                     events_to_sync.append(event)
                     print("Event out of sync")
                 else:

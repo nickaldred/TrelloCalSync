@@ -12,7 +12,26 @@ load_dotenv("./.env")
 class Config:
     """Configuration for the program."""
 
-    status: dict
+    status_colour_ids: dict
+
+    def get_status_colour_id(self, status_name: str) -> int:
+        """Get the status colour id for a status.
+
+        Args:
+            status_name (str): The name of the status.
+
+        Returns:
+            dict: The status colour id.
+        """
+
+        if status_name in self.status_colour_ids:
+            return self.status_colour_ids[status_name]
+        else:
+            print(
+                f"Status {status_name} not found in config, "
+                "using default status"
+            )
+            return self.status_colour_ids["DEFAULT"]
 
 
 def get_config() -> Config:

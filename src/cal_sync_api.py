@@ -55,7 +55,7 @@ def add_event(event: Event) -> dict:
         event.description,
         event.start_datetime,
         event.end_datetime,
-        CONFIG.status[event.current_status],
+        CONFIG.get_status_colour_id(event.current_status),
         event.calendar_id,
         event.location,
     )
