@@ -1,11 +1,10 @@
 """Syncs the board and calendar."""
 
+import factorys
+from config import Config, get_config
+from exceptions import SyncError
 from google_calendar_handler import GoogleCalendarHandler
 from mongodb_handler import MongoDbHandler
-from exceptions import SyncError
-import factorys
-
-test_dict = {"TO_DO": 7, "IN_PROGRESS": 6, "DONE": 2}
 
 
 class SyncProcessor:
@@ -16,15 +15,16 @@ class SyncProcessor:
         calendar_handler: GoogleCalendarHandler,
         db_handler: MongoDbHandler,
     ):
-        self.calendar_handler: GoogleCalendarHandler = calendar_handler
-        self.db_handler: MongoDbHandler = db_handler
+        self._calendar_handler: GoogleCalendarHandler = calendar_handler
+        self._db_handler: MongoDbHandler = db_handler
+        self._config: Config = get_config()
 
     def sync(
         self,
     ):
         """Syncs the calendar with the board events"""
 
-        events: dict = self.db_handler.get_all_documents("calendar_events")
+        events: dict = self._db_handler.get_all_documents("calendar_events")
 
         if not events:
             raise SyncError("No events found")
@@ -48,7 +48,7 @@ class SyncProcessor:
 
         event_ids: list = [event["event_id"] for event in events]
 
-        calendar_events: dict = self.calendar_handler.get_events_by_ids(
+        calendar_events: dict = self._calendar_handler.get_events_by_ids(
             event_ids
         )
         return calendar_events
@@ -74,7 +74,7 @@ class SyncProcessor:
             if event_id not in calendar_events:
                 events_to_sync.append(event)
             else:
-                if not test_dict[event["current_status"]] == int(
+                if not self._config.status[event["current_status"]] == int(
                     calendar_events[event_id]["colorId"]
                 ):
                     events_to_sync.append(event)

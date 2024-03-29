@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from typing import Optional
+from config import Config, get_config
 from factorys import calendar_handler_factory, db_handler_factory
 from fastapi import FastAPI, HTTPException
 from google_calendar_handler import GoogleCalendarHandler
@@ -9,15 +10,12 @@ from mongodb_handler import MongoDbHandler
 from pydantic import BaseModel
 from uvicorn import run
 
-app: FastAPI = FastAPI()
-
-
-calendar_handler: Optional[GoogleCalendarHandler] = calendar_handler_factory(
+APP: FastAPI = FastAPI()
+CALENDAR_HANDLER: Optional[GoogleCalendarHandler] = calendar_handler_factory(
     "google"
 )
-db_handler: Optional[MongoDbHandler] = db_handler_factory("mongo")
-
-test_dict = {"TO_DO": 7, "IN_PROGRESS": 6, "DONE": 2}
+DB_HANDLER: Optional[MongoDbHandler] = db_handler_factory("mongo")
+CONFIG: Config = get_config()
 
 
 class Event(BaseModel):
@@ -36,7 +34,7 @@ class Event(BaseModel):
     created_at: datetime = datetime.now()
 
 
-@app.post("/add_event")
+@APP.post("/add_event")
 def add_event(event: Event) -> dict:
     """Add an event to the calendar and database.
 
@@ -47,24 +45,24 @@ def add_event(event: Event) -> dict:
         dict: The added event.
     """
 
-    if not calendar_handler or not db_handler:
+    if not CALENDAR_HANDLER or not DB_HANDLER:
         raise HTTPException(
             status_code=400, detail="Calendar or database handler not found"
         )
 
-    event_id: Optional[str] = calendar_handler.add_event(
+    event_id: Optional[str] = CALENDAR_HANDLER.add_event(
         event.title,
         event.description,
         event.start_datetime,
         event.end_datetime,
-        test_dict[event.current_status],
+        CONFIG.status[event.current_status],
         event.calendar_id,
         event.location,
     )
     event.event_id = event_id
 
     if event_id:
-        db_result: bool = db_handler.add_document(
+        db_result: bool = DB_HANDLER.add_document(
             "calendar_events", event.model_dump()
         )
 
@@ -76,7 +74,7 @@ def add_event(event: Event) -> dict:
                 "Unable to add calendar event to database, "
                 "removing from calendar"
             )
-            calendar_handler.delete_event_by_id(event_id, event.calendar_id)
+            CALENDAR_HANDLER.delete_event_by_id(event_id, event.calendar_id)
             raise HTTPException(
                 status_code=400,
                 detail="Event not added, unable to add to database",
@@ -89,7 +87,7 @@ def add_event(event: Event) -> dict:
         )
 
 
-@app.get("/get_event/{event_id}")
+@APP.get("/get_event/{event_id}")
 def get_event(trello_card_id: str) -> dict:
     """Get an event from the database.
 
@@ -100,23 +98,23 @@ def get_event(trello_card_id: str) -> dict:
         dict: The event.
     """
 
-    if not db_handler or not calendar_handler:
+    if not DB_HANDLER or not CALENDAR_HANDLER:
         raise HTTPException(
             status_code=400, detail="Calendar or database handler not found"
         )
 
-    event_data: dict = db_handler.get_document(
+    event_data: dict = DB_HANDLER.get_document(
         "calendar_events", {"trello_card_id": trello_card_id}
     )
 
-    calendar_event: dict = calendar_handler.get_event_by_id(
+    calendar_event: dict = CALENDAR_HANDLER.get_event_by_id(
         event_data["event_id"], event_data["calendar_id"]
     )
 
     return calendar_event
 
 
-@app.delete("/delete_event/{event_id}")
+@APP.delete("/delete_event/{event_id}")
 def delete_event(trello_card_id: str) -> dict:
     """Delete an event from the calendar and database.
 
@@ -126,22 +124,22 @@ def delete_event(trello_card_id: str) -> dict:
     Returns:
         dict: The deleted event.
     """
-    if not db_handler or not calendar_handler:
+    if not DB_HANDLER or not CALENDAR_HANDLER:
         raise HTTPException(
             status_code=400, detail="Calendar or database handler not found"
         )
 
-    event_data: dict = db_handler.get_document(
+    event_data: dict = DB_HANDLER.get_document(
         "calendar_events", {"trello_card_id": trello_card_id}
     )
 
-    deleted_from_calendar: dict = calendar_handler.delete_event_by_id(
+    deleted_from_calendar: dict = CALENDAR_HANDLER.delete_event_by_id(
         event_data["event_id"], event_data["calendar_id"]
     )
 
     print(f"deleted_from_calendar: {deleted_from_calendar}")
     if deleted_from_calendar:
-        deleted_event_data: bool = db_handler.delete_document(
+        deleted_event_data: bool = DB_HANDLER.delete_document(
             "calendar_events", {"trello_card_id": trello_card_id}
         )
 
@@ -166,9 +164,9 @@ def delete_event(trello_card_id: str) -> dict:
         )
 
 
-@app.put("/update_event/{event_id}")
+@APP.put("/update_event/{event_id}")
 def update_event(event_id: str, event: Event) -> dict:
-    return calendar_handler.update_event_by_id(
+    return CALENDAR_HANDLER.update_event_by_id(
         event_id,
         event.title,
         event.description,
@@ -183,4 +181,4 @@ def update_event(event_id: str, event: Event) -> dict:
 
 
 if __name__ == "__main__":
-    run("cal_sync_api:app", host="0.0.0.0", port=8000, log_level="info")
+    run("cal_sync_api:APP", host="0.0.0.0", port=8000, log_level="info")

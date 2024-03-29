@@ -1,0 +1,9 @@
+{
+    "status": {
+        "TO_DO": 7,
+        "IN_PROGRESS": 6,
+        "DONE": 2,
+        "BACKLOG": 1,
+        "ARCHIVED": 0
+    }
+}
