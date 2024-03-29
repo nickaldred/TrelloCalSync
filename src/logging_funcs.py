@@ -1,15 +1,22 @@
-import functools
-import logging
+"""Functions to log messages."""
+
 from datetime import datetime
+from functools import wraps
+from logging import DEBUG, INFO, FileHandler, Logger, LogRecord, getLogger
+from os import environ, makedirs
+from os.path import dirname
 from typing import Any, Callable, Optional
+from dotenv import load_dotenv
 from json_log_formatter import JSONFormatter
+
+load_dotenv("./.env")
 
 
 class CustomisedJSONFormatter(JSONFormatter):
     """Customised JSON formatter."""
 
     def json_record(
-        self, message: str, extra: dict, record: logging.LogRecord
+        self, message: str, extra: dict, record: LogRecord
     ) -> dict:
         """Create a JSON log record.
 
@@ -30,27 +37,42 @@ class CustomisedJSONFormatter(JSONFormatter):
         }
 
 
-def get_logger() -> logging.Logger:
+def get_logger(log_level: str, log_file_path: str) -> Logger:
     """Get a logger.
+
+    Args:
+        log_level (str): Log level
+        log_file_path (str): Log file path
 
     Returns:
         logging.Logger: Logger
     """
 
+    # Create the log file directory if it doesn't exist.
+    makedirs(dirname(log_file_path), exist_ok=True)
+
     formatter: CustomisedJSONFormatter = CustomisedJSONFormatter()
 
-    json_handler = logging.FileHandler(
-        filename="/home/nicka/projects/cal_sync/logs/cal_sync_logs.log"
+    json_handler: FileHandler = FileHandler(
+        filename=log_file_path,
     )
     json_handler.setFormatter(formatter)
 
-    logger = logging.getLogger(__name__)
+    logger: Logger = getLogger(__name__)
     logger.addHandler(json_handler)
-    logger.setLevel(logging.INFO)
+
+    if log_level == "DEBUG":
+        logger.setLevel(DEBUG)
+    else:
+        logger.setLevel(INFO)
+
     return logger
 
 
-LOGGER: logging.Logger = get_logger()
+LOGGER: Logger = get_logger(
+    environ.get("LOG_LEVEL", "INFO"),
+    environ.get("LOG_FILE_PATH", "tmp/logs/cal_sync_logs.log"),
+)
 
 
 def log_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -63,7 +85,7 @@ def log_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         Callable[..., Any]: Wrapper function.
     """
 
-    @functools.wraps(func)
+    @wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
 
         item_id: Any = kwargs.pop("item_id", None)
@@ -97,7 +119,7 @@ def debug_log_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         Callable[..., Any]: Wrapper function.
     """
 
-    @functools.wraps(func)
+    @wraps(func)
     def wrapper(*args, **kwargs):
 
         item_id: Any = kwargs.pop("item_id", None)
@@ -145,15 +167,59 @@ def log_error(
     )
 
 
-@log_decorator
-def test(item_id=None):
+def log_info(message: str, item_id: Optional[str] = None) -> None:
+    """Log an info message.
 
-    try:
-        result = 1 + 2
-        # raise KeyError
-    except KeyError as e:
-        log_error("KeyError occurred", error_type="KeyError", item_id=item_id)
-        raise e
+    Args:
+        message (str): Info message
+        item_id (Optional[str], optional): Item ID. Defaults to None.
+
+    return:
+        None
+    """
+
+    LOGGER.info(
+        message,
+        extra={
+            "item_id": item_id,
+            "function_name": "log_info",
+        },
+    )
 
 
-test(item_id=1)
+def log_debug(message: str, item_id: Optional[str] = None) -> None:
+    """Log a debug message.
+
+    Args:
+        message (str): Debug message
+        item_id (Optional[str], optional): Item ID. Defaults to None.
+
+    return:
+        None
+    """
+
+    LOGGER.debug(
+        message,
+        extra={
+            "item_id": item_id,
+            "function_name": "log_debug",
+        },
+    )
+
+
+if __name__ == "__main__":
+
+    # Test the log_decorator function.
+    @log_decorator
+    def test(item_id=None):
+
+        try:
+            result = 1 + 2
+            # raise KeyError
+        except KeyError as e:
+            log_error(
+                "KeyError occurred", error_type="KeyError", item_id=item_id
+            )
+            raise e
+
+    test(item_id=1)
