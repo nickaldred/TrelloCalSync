@@ -229,10 +229,12 @@ if __name__ == "__main__":
 
     # Test the log_decorator function.
     @log_decorator
-    def test(item_id: int):
+    def test(item_id: str):
+        """Test function."""
 
         try:
-            result = 1 + 2
+            result: int = 1 + 2
+            return result
             # raise KeyError
         except KeyError as e:
             log_error(
