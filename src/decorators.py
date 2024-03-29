@@ -1,8 +1,8 @@
-import logging
 import functools
-from typing import Any, Optional
-from json_log_formatter import JSONFormatter
+import logging
 from datetime import datetime
+from typing import Any, Callable, Optional
+from json_log_formatter import JSONFormatter
 
 
 class CustomisedJSONFormatter(JSONFormatter):
@@ -11,7 +11,17 @@ class CustomisedJSONFormatter(JSONFormatter):
     def json_record(
         self, message: str, extra: dict, record: logging.LogRecord
     ) -> dict:
-        """Create a JSON log record."""
+        """Create a JSON log record.
+
+        Args:
+            message (str): Log message
+            extra (dict): Extra information
+            record (logging.LogRecord): Log record
+
+        Returns:
+            dict: JSON log record
+        """
+
         return {
             "time_stamp": datetime.now().isoformat(),
             "log_level": record.levelname,
@@ -43,11 +53,18 @@ def get_logger() -> logging.Logger:
 LOGGER: logging.Logger = get_logger()
 
 
-def log_decorator(func):
-    """Decorator to log the start and end of a function execution."""
+def log_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+    """Decorator to log the start and end of a function execution.
+
+    Args:
+        func (Callable[..., Any]): Function to be wrapped.
+
+    Returns:
+        Callable[..., Any]: Wrapper function.
+    """
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
 
         item_id: Any = kwargs.pop("item_id", None)
         LOGGER.info(
@@ -70,8 +87,15 @@ def log_decorator(func):
     return wrapper
 
 
-def debug_log_decorator(func):
-    """Decorator to debug log the start and end of a function execution."""
+def debug_log_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+    """Decorator to debug log the start and end of a function execution.
+
+    Args:
+        func (Callable[..., Any]): Function to be wrapped.
+
+    Returns:
+        Callable[..., Any]: Wrapper function.
+    """
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
