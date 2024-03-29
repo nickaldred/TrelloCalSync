@@ -1,5 +1,5 @@
 {
-    "status": {
+    "status_colour_ids": {
         "DEFAULT": 7,
         "TO_DO": 7,
         "IN_PROGRESS": 6,

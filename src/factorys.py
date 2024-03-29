@@ -2,6 +2,7 @@
 
 from os import environ
 from typing import Optional
+from logging_funcs import debug_log_decorator
 from dotenv import load_dotenv
 from exceptions import FactoryError
 from google_calendar_handler import GoogleCalendarHandler
@@ -11,6 +12,7 @@ from trello_handler import TrelloHandler
 load_dotenv("./.env")
 
 
+@debug_log_decorator
 def calendar_handler_factory(
     type_of_handler: str,
 ) -> Optional[GoogleCalendarHandler]:
@@ -34,6 +36,7 @@ def calendar_handler_factory(
         raise FactoryError("Invalid calendar handler type")
 
 
+@debug_log_decorator
 def db_handler_factory(type_of_handler: str) -> Optional[MongoDbHandler]:
     """Create a database handler.
 
@@ -49,6 +52,7 @@ def db_handler_factory(type_of_handler: str) -> Optional[MongoDbHandler]:
         raise FactoryError("Invalid database handler type")
 
 
+@debug_log_decorator
 def board_handler_factory(type_of_handler: str) -> Optional[TrelloHandler]:
     """Create a board handler.
 

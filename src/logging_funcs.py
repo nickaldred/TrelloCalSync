@@ -144,7 +144,9 @@ def debug_log_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
 
 
 def log_error(
-    message: str, error_type: str, item_id: Optional[str] = None
+    message: str,
+    error_type: Optional[str] = None,
+    item_id: Optional[str] = None,
 ) -> None:
     """Log an error message.
 
@@ -162,7 +164,6 @@ def log_error(
         extra={
             "item_id": item_id,
             "error_type": error_type,
-            "function_name": "log_error",
         },
     )
 
@@ -182,7 +183,6 @@ def log_info(message: str, item_id: Optional[str] = None) -> None:
         message,
         extra={
             "item_id": item_id,
-            "function_name": "log_info",
         },
     )
 
@@ -202,7 +202,6 @@ def log_debug(message: str, item_id: Optional[str] = None) -> None:
         message,
         extra={
             "item_id": item_id,
-            "function_name": "log_debug",
         },
     )
 
@@ -211,7 +210,7 @@ if __name__ == "__main__":
 
     # Test the log_decorator function.
     @log_decorator
-    def test(item_id=None):
+    def test():
 
         try:
             result = 1 + 2
