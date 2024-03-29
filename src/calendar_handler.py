@@ -23,6 +23,8 @@ class CalendarHandler(ABC):
         description: str,
         start_datetime: datetime,
         end_datetime: datetime,
+        color_id: int,
+        calendar_id: Optional[str],
         location: Optional[str] = None,
     ):
         """Adds an event to the calendar"""

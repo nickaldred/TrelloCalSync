@@ -55,23 +55,25 @@ class GoogleCalendarHandler(CalendarHandler):
 
     def add_event(
         self,
-        summary: str,
+        title: str,
         description: str,
         start_datetime: datetime,
         end_datetime: datetime,
-        location: Optional[str] = None,
+        color_id: int = 7,
         calendar_id: Optional[str] = "primary",
+        location: Optional[str] = None,
     ) -> Optional[str]:
         """Add an event to the calendar.
 
-        Adds an event to the calendar with the given summary,
-        description, start and end times, and location.
+        Adds an event to the calendar with the given title,
+        description, start and end times, color id, and location.
 
         Args:
-            summary (str): The summary of the event.
+            title (str): The title of the event.
             description (str): The description of the event.
             start_datetime (datetime): The start time of the event.
             end_datetime (datetime): The end time of the event.
+            color_id (str): The color id of the event.
             location (str): The location of the event.
             calendar_id (str): The ID of the calendar to add the
             event to.
@@ -81,9 +83,10 @@ class GoogleCalendarHandler(CalendarHandler):
         """
 
         event_to_add: dict = {
-            "summary": summary,
+            "summary": title,
             "location": location,
             "description": description,
+            "colorId": color_id,
             "start": {
                 "dateTime": start_datetime.isoformat(),
                 "timeZone": "Europe/London",
@@ -236,7 +239,10 @@ class GoogleCalendarHandler(CalendarHandler):
         def callback(request_id, response, exception):
             if exception is not None:
                 print(f"An error occurred: {exception}")
+
             else:
+                event_color_id = response.get("colorId", "Not specified")
+                response["colorId"] = event_color_id
                 calendar_events[request_id] = response
 
         calendar_events: dict = {}

@@ -17,6 +17,8 @@ calendar_handler: Optional[GoogleCalendarHandler] = calendar_handler_factory(
 )
 db_handler: Optional[MongoDbHandler] = db_handler_factory("mongo")
 
+test_dict = {"TO_DO": 7, "IN_PROGRESS": 6, "DONE": 2}
+
 
 class Event(BaseModel):
     """The event model."""
@@ -29,6 +31,7 @@ class Event(BaseModel):
     calendar_id: str = "primary"
     card_id: str
     board_id: str
+    current_status: str = "TO_DO"
     event_id: Optional[str] = None
     created_at: datetime = datetime.now()
 
@@ -54,8 +57,9 @@ def add_event(event: Event) -> dict:
         event.description,
         event.start_datetime,
         event.end_datetime,
-        event.location,
+        test_dict[event.current_status],
         event.calendar_id,
+        event.location,
     )
     event.event_id = event_id
 
