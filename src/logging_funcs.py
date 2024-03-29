@@ -210,7 +210,7 @@ if __name__ == "__main__":
 
     # Test the log_decorator function.
     @log_decorator
-    def test():
+    def test(item_id: int):
 
         try:
             result = 1 + 2
