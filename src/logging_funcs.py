@@ -206,6 +206,25 @@ def log_debug(message: str, item_id: Optional[str] = None) -> None:
     )
 
 
+def log_warning(message: str, item_id: Optional[str] = None) -> None:
+    """Log a warning message.
+
+    Args:
+        message (str): Warning message
+        item_id (Optional[str], optional): Item ID. Defaults to None.
+
+    return:
+        None
+    """
+
+    LOGGER.warning(
+        message,
+        extra={
+            "item_id": item_id,
+        },
+    )
+
+
 if __name__ == "__main__":
 
     # Test the log_decorator function.
