@@ -2,9 +2,10 @@
 
 from google_calendar_handler import GoogleCalendarHandler
 from mongodb_handler import MongoDbHandler
-from trello_handler import TrelloHandler
 from exceptions import SyncError
 import factorys
+
+test_dict = {"TO_DO": 7, "IN_PROGRESS": 6, "DONE": 2}
 
 
 class SyncProcessor:
@@ -29,12 +30,14 @@ class SyncProcessor:
             raise SyncError("No events found")
 
         calendar_events: dict = self.get_calendar_events(events)
-        print(calendar_events)
 
         if not calendar_events:
             raise SyncError("No events found")
 
         events_to_sync: list = self.compare_events(calendar_events, events)
+
+        if events_to_sync:
+            self.sync_up_events(events_to_sync)
 
     def get_calendar_events(self, events: list[dict]) -> dict:
         """Gets the events from the calendar.
@@ -53,13 +56,35 @@ class SyncProcessor:
     def compare_events(
         self, calendar_events: dict, events: list[dict]
     ) -> list:
-        """Compares the events to check if they are in sync."""
+        """Compares the events to check if they are in sync.
+
+        Args:
+            calendar_events (dict): The calendar events.
+            events (list[dict]): The board events.
+
+        Returns:
+            list: The events to sync.
+        """
 
         events_to_sync: list = []
 
+        for event in events:
+            event_id: str = event["event_id"]
+
+            if event_id not in calendar_events:
+                events_to_sync.append(event)
+            else:
+                if not test_dict[event["current_status"]] == int(
+                    calendar_events[event_id]["colorId"]
+                ):
+                    events_to_sync.append(event)
+                    print("Event out of sync")
+                else:
+                    print("Event in sync")
+
         return events_to_sync
 
-    def sync_up_events(self):
+    def sync_up_events(self, events_to_sync: list):
         """Syncs up the out of sync board and calendar events."""
 
 
