@@ -6,7 +6,6 @@ from datetime import datetime
 
 class CustomisedJSONFormatter(json_log_formatter.JSONFormatter):
     def json_record(self, message, extra, record):
-        extra["timestamp"] = datetime.now().isoformat()
         return super(CustomisedJSONFormatter, self).json_record(
             message, extra, record
         )
@@ -31,18 +30,23 @@ def get_logger():
 def log_decorator(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
+        item_id = kwargs.pop("item_id", None)
         logger.info(
-            {
+            "execution_started",
+            extra={
+                "time_stamp": datetime.now(),
+                "item_id": item_id,
                 "function_name": func.__name__,
-                "event": "execution_started",
-            }
+            },
         )
         result = func(*args, **kwargs)
         logger.info(
-            {
+            "execution_ended",
+            extra={
+                "time_stamp": datetime.now(),
+                "item_id": item_id,
                 "function_name": func.__name__,
-                "event": "execution_ended",
-            }
+            },
         )
         return result
 
@@ -52,18 +56,27 @@ def log_decorator(func):
 def debug_log_decorator(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        logger.debug(
+        item_id = kwargs.pop("item_id", None)
+        logger.info(
             {
-                "function_name": func.__name__,
                 "event": "execution_started",
-            }
+            },
+            extra={
+                "time_stamp": datetime.now(),
+                "item_id": item_id,
+                "function_name": func.__name__,
+            },
         )
         result = func(*args, **kwargs)
-        logger.debug(
+        logger.info(
             {
-                "function_name": func.__name__,
                 "event": "execution_ended",
-            }
+            },
+            extra={
+                "time_stamp": datetime.now(),
+                "item_id": item_id,
+                "function_name": func.__name__,
+            },
         )
         return result
 
