@@ -3,7 +3,6 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
-
 from pydantic import BaseModel
 
 
@@ -12,15 +11,17 @@ class Event(BaseModel):
 
     title: str
     description: str
-    start_datetime: datetime
-    end_datetime: datetime
+    start_datetime: str
+    end_datetime: str
     location: Optional[str] = None
     calendar_id: str = "primary"
     card_id: str
     board_id: str
     current_status: str = "TO_DO"
+    colour_id: Optional[int] = None
     event_id: Optional[str] = None
-    created_at: datetime = datetime.now()
+    timezone: str = "Europe/London"
+    created_at: str = datetime.now().isoformat()
 
 
 @dataclass

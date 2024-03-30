@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from os.path import exists
 from typing import Optional
 from calendar_handler import CalendarHandler
+from data_models import Event
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -54,13 +55,7 @@ class GoogleCalendarHandler(CalendarHandler):
 
     def add_event(
         self,
-        title: str,
-        description: str,
-        start_datetime: datetime,
-        end_datetime: datetime,
-        color_id: int = 7,
-        calendar_id: Optional[str] = "primary",
-        location: Optional[str] = None,
+        event: Event,
     ) -> Optional[str]:
         """Add an event to the calendar.
 
@@ -68,31 +63,24 @@ class GoogleCalendarHandler(CalendarHandler):
         description, start and end times, color id, and location.
 
         Args:
-            title (str): The title of the event.
-            description (str): The description of the event.
-            start_datetime (datetime): The start time of the event.
-            end_datetime (datetime): The end time of the event.
-            color_id (str): The color id of the event.
-            location (str): The location of the event.
-            calendar_id (str): The ID of the calendar to add the
-            event to.
+            event (Event): The event to add.
 
         Returns:
             str: The ID of the event that was added.
         """
 
         event_to_add: dict = {
-            "summary": title,
-            "location": location,
-            "description": description,
-            "colorId": color_id,
+            "summary": event.title,
+            "location": event.location,
+            "description": event.description,
+            "colorId": event.colour_id,
             "start": {
-                "dateTime": start_datetime.isoformat(),
-                "timeZone": "Europe/London",
+                "dateTime": event.start_datetime,
+                "timeZone": event.timezone,
             },
             "end": {
-                "dateTime": end_datetime.isoformat(),
-                "timeZone": "Europe/London",
+                "dateTime": event.end_datetime,
+                "timeZone": event.timezone,
             },
         }
 

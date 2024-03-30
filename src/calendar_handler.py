@@ -4,9 +4,8 @@ define the methods that should be implemented by concrete calendar handler
 classes.
 """
 
-from typing import Optional
 from abc import ABC, abstractmethod
-from datetime import datetime
+from data_models import Event
 
 
 class CalendarHandler(ABC):
@@ -19,13 +18,7 @@ class CalendarHandler(ABC):
     @abstractmethod
     def add_event(
         self,
-        title: str,
-        description: str,
-        start_datetime: datetime,
-        end_datetime: datetime,
-        color_id: int,
-        calendar_id: Optional[str],
-        location: Optional[str] = None,
+        event: Event,
     ):
         """Adds an event to the calendar"""
 

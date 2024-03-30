@@ -41,15 +41,9 @@ def add_event(event: Event) -> dict:
         log_error(error_msg, item_id=event.card_id)
         raise HTTPException(status_code=400, detail=error_msg)
 
-    event_id: Optional[str] = CALENDAR_HANDLER.add_event(
-        event.title,
-        event.description,
-        event.start_datetime,
-        event.end_datetime,
-        CONFIG.get_status_colour_id(event.current_status),
-        event.calendar_id,
-        event.location,
-    )
+    event.colour_id = CONFIG.get_status_colour_id(event.current_status)
+    event.timezone = environ["TIME_ZONE"]
+    event_id: Optional[str] = CALENDAR_HANDLER.add_event(event)
     event.event_id = event_id
 
     if event_id:
