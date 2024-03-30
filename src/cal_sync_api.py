@@ -1,16 +1,15 @@
 """Sets up the API for the calendar sync service."""
 
-from datetime import datetime
 from os import environ
 from typing import Optional
 from config import Config, get_config
+from data_models import Event
 from dotenv import load_dotenv
 from factorys import calendar_handler_factory, db_handler_factory
 from fastapi import FastAPI, HTTPException
 from google_calendar_handler import GoogleCalendarHandler
 from logging_funcs import log_decorator, log_error, log_info
 from mongodb_handler import MongoDbHandler
-from pydantic import BaseModel
 from uvicorn import run
 
 load_dotenv("./.env")
@@ -23,22 +22,6 @@ DB_HANDLER: Optional[MongoDbHandler] = db_handler_factory(
     environ.get("DB_TYPE")
 )
 CONFIG: Config = get_config()
-
-
-class Event(BaseModel):
-    """The event model."""
-
-    title: str
-    description: str
-    start_datetime: datetime
-    end_datetime: datetime
-    location: Optional[str] = None
-    calendar_id: str = "primary"
-    card_id: str
-    board_id: str
-    current_status: str = "TO_DO"
-    event_id: Optional[str] = None
-    created_at: datetime = datetime.now()
 
 
 @APP.post("/add_event")
