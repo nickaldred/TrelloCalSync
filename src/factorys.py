@@ -1,5 +1,6 @@
 """Factory functions for creating handlers."""
 
+from ast import literal_eval
 from os import environ
 from typing import Optional
 from logging_funcs import debug_log_decorator
@@ -26,11 +27,11 @@ def calendar_handler_factory(
     """
     if type_of_handler == "google":
         return GoogleCalendarHandler(
-            scopes=[
-                "https://www.googleapis.com/auth/calendar",
+            scopes=literal_eval(environ["CALENDAR_SCOPES"]),
+            token_file_path=environ["CALENDAR_TOKEN_FILE_PATH"],
+            service_account_file_path=environ[
+                "CALENDAR_SERVICE_ACCOUNT_FILE_PATH"
             ],
-            token_file_path="token.json",
-            service_account_file_path="credentials.json",
         )
     else:
         raise FactoryError("Invalid calendar handler type")
@@ -47,7 +48,11 @@ def db_handler_factory(type_of_handler: str) -> Optional[MongoDbHandler]:
         MongoDbHandler: The database handler.
     """
     if type_of_handler == "mongo":
-        return MongoDbHandler(host="localhost", port=27017, db_name="cal_sync")
+        return MongoDbHandler(
+            host=environ["DB_HOST"],
+            port=int(environ["DB_PORT"]),
+            db_name=environ["DB_NAME"],
+        )
     else:
         raise FactoryError("Invalid database handler type")
 
@@ -64,9 +69,9 @@ def board_handler_factory(type_of_handler: str) -> Optional[TrelloHandler]:
     """
     if type_of_handler == "trello":
         return TrelloHandler(
-            api_key=environ["board_api_key"],
-            api_secret=environ["board_api_secret"],
-            token=environ["board_token"],
+            api_key=environ["BOARD_API_KEY"],
+            api_secret=environ["BOARD_API_SECRET"],
+            token=environ["BOARD_TOKEN"],
         )
     else:
         raise FactoryError("Invalid board handler type")
