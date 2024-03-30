@@ -19,7 +19,7 @@ class CalendarHandler(ABC):
     @abstractmethod
     def add_event(
         self,
-        summary: str,
+        title: str,
         description: str,
         start_datetime: datetime,
         end_datetime: datetime,
