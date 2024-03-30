@@ -75,7 +75,7 @@ class GoogleCalendarHandler(CalendarHandler):
             self._service.events()
             .insert(
                 calendarId=event.calendar_id,
-                body=event.get_calendar_event(),
+                body=event.get_calendar_event().model_dump(),
             )
             .execute()
         )

@@ -6,6 +6,17 @@ from typing import Optional
 from pydantic import BaseModel
 
 
+class CalendarEvent(BaseModel):
+    """Calendar event model."""
+
+    summary: str
+    location: Optional[str]
+    description: str
+    colorId: Optional[int]
+    start: dict
+    end: dict
+
+
 class Event(BaseModel):
     """The event model."""
 
@@ -23,26 +34,27 @@ class Event(BaseModel):
     timezone: str = "Europe/London"
     created_at: str = datetime.now().isoformat()
 
-    def get_calendar_event(self) -> dict:
+    def get_calendar_event(self) -> CalendarEvent:
         """Return the event in the required format.
 
         Returns:
-            dict: The event in the required format.
+            CalendarEvent: The event in the required format.
         """
-        return {
-            "summary": self.title,
-            "location": self.location,
-            "description": self.description,
-            "colorId": self.colour_id,
-            "start": {
+
+        return CalendarEvent(
+            summary=self.title,
+            location=self.location,
+            description=self.description,
+            colorId=self.colour_id,
+            start={
                 "dateTime": self.start_datetime,
                 "timeZone": self.timezone,
             },
-            "end": {
+            end={
                 "dateTime": self.end_datetime,
                 "timeZone": self.timezone,
             },
-        }
+        )
 
 
 @dataclass
