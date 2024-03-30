@@ -42,13 +42,15 @@ class GoogleCalendarHandler(CalendarHandler):
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    service_account_file_path, scopes
+                flow: InstalledAppFlow = (
+                    InstalledAppFlow.from_client_secrets_file(
+                        service_account_file_path, scopes
+                    )
                 )
                 creds = flow.run_local_server(port=0)
 
             # Save the credentials for the next run
-            with open(token_file_path, "w") as token:
+            with open(token_file_path, "w", encoding="utf-8") as token:
                 token.write(creds.to_json())
 
         self._service = build("calendar", "v3", credentials=creds)
