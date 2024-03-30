@@ -2,7 +2,15 @@
 
 from datetime import datetime
 from functools import wraps
-from logging import DEBUG, INFO, FileHandler, Logger, LogRecord, getLogger
+from logging import (
+    DEBUG,
+    INFO,
+    FileHandler,
+    Logger,
+    LogRecord,
+    StreamHandler,
+    getLogger,
+)
 from os import environ, makedirs
 from os.path import dirname
 from typing import Any, Callable, Optional
@@ -53,13 +61,17 @@ def get_logger(log_level: str, log_file_path: str) -> Logger:
 
     formatter: CustomisedJSONFormatter = CustomisedJSONFormatter()
 
-    json_handler: FileHandler = FileHandler(
-        filename=log_file_path,
-    )
+    # File handler for writing logs to file.
+    json_handler: FileHandler = FileHandler(filename=log_file_path)
     json_handler.setFormatter(formatter)
+
+    # Stream handler for writing logs to console.
+    console_handler: StreamHandler = StreamHandler()
+    console_handler.setFormatter(formatter)
 
     logger: Logger = getLogger(__name__)
     logger.addHandler(json_handler)
+    logger.addHandler(console_handler)
 
     if log_level == "DEBUG":
         logger.setLevel(DEBUG)
