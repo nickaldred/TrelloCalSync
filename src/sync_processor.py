@@ -36,7 +36,7 @@ class SyncProcessor:
     ):
         """Syncs the calendar with the board events"""
 
-        events: dict = self._db_handler.get_all_documents("calendar_events")
+        events: list = self._db_handler.get_all_documents("calendar_events")
 
         if not events:
             raise SyncError("No events found")

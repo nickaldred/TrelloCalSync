@@ -71,26 +71,11 @@ class GoogleCalendarHandler(CalendarHandler):
             str: The ID of the event that was added.
         """
 
-        event_to_add: dict = {
-            "summary": event.title,
-            "location": event.location,
-            "description": event.description,
-            "colorId": event.colour_id,
-            "start": {
-                "dateTime": event.start_datetime,
-                "timeZone": event.timezone,
-            },
-            "end": {
-                "dateTime": event.end_datetime,
-                "timeZone": event.timezone,
-            },
-        }
-
         added_event = (
             self._service.events()
             .insert(
-                calendarId=calendar_id,
-                body=event_to_add,
+                calendarId=event.calendar_id,
+                body=event.get_calendar_event(),
             )
             .execute()
         )

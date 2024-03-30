@@ -23,6 +23,27 @@ class Event(BaseModel):
     timezone: str = "Europe/London"
     created_at: str = datetime.now().isoformat()
 
+    def get_calendar_event(self) -> dict:
+        """Return the event in the required format.
+
+        Returns:
+            dict: The event in the required format.
+        """
+        return {
+            "summary": self.title,
+            "location": self.location,
+            "description": self.description,
+            "colorId": self.colour_id,
+            "start": {
+                "dateTime": self.start_datetime,
+                "timeZone": self.timezone,
+            },
+            "end": {
+                "dateTime": self.end_datetime,
+                "timeZone": self.timezone,
+            },
+        }
+
 
 @dataclass
 class BoardCard:
