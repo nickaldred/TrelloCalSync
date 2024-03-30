@@ -1,8 +1,9 @@
 """Syncs the board and calendar."""
 
-from factorys import calendar_handler_factory, db_handler_factory
+from time import sleep
 from config import Config, get_config
 from exceptions import SyncError
+from factorys import calendar_handler_factory, db_handler_factory
 from google_calendar_handler import GoogleCalendarHandler
 from mongodb_handler import MongoDbHandler
 
@@ -19,7 +20,18 @@ class SyncProcessor:
         self._db_handler: MongoDbHandler = db_handler
         self._config: Config = get_config()
 
-    def sync(
+    def sync(self, sync_interval: int = 60) -> None:
+        """Syncs the board and calendar at regular intervals.
+
+        Args:
+            sync_interval (int): The interval in seconds between syncs.
+        """
+
+        while True:
+            self.sync_events()
+            sleep(sync_interval)
+
+    def sync_events(
         self,
     ):
         """Syncs the calendar with the board events"""
