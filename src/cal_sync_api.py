@@ -197,4 +197,10 @@ def update_event(event_id: str, event: Event) -> dict:
 
 
 if __name__ == "__main__":
-    run("cal_sync_api:APP", host="0.0.0.0", port=8000, log_level="info")
+    # Test the API
+    run(
+        "cal_sync_api:APP",
+        host=environ["API_HOST"],
+        port=int(environ["API_PORT"]),
+        log_level=environ["LOG_LEVEL"].lower(),
+    )
