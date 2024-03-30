@@ -26,14 +26,14 @@ CONFIG: Config = get_config()
 
 @APP.post("/add_event")
 @log_decorator
-def add_event(event: Event) -> dict:
+def add_event(event: Event) -> Event:
     """Add an event to the calendar and database.
 
     Args:
         event (Event): The event to add.
 
     Returns:
-        dict: The added event.
+        Event: The added event.
     """
 
     if not CALENDAR_HANDLER or not DB_HANDLER:
@@ -56,7 +56,7 @@ def add_event(event: Event) -> dict:
                 "Successfully added calendar event to calendar and database",
                 item_id=event.card_id,
             )
-            return event.model_dump()
+            return event
 
         else:
             error_msg = "Unable to add calendar event to database"
