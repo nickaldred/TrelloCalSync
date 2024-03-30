@@ -1,6 +1,6 @@
 """Syncs the board and calendar."""
 
-import factorys
+from factorys import calendar_handler_factory, db_handler_factory
 from config import Config, get_config
 from exceptions import SyncError
 from google_calendar_handler import GoogleCalendarHandler
@@ -88,9 +88,15 @@ class SyncProcessor:
         """Syncs up the out of sync board and calendar events."""
 
 
-calendar_handler = factorys.calendar_handler_factory("google")
-db_handler = factorys.db_handler_factory("mongo")
+if __name__ == "__main__":
 
+    # Test the SyncProcessor class
+    test_calendar_handler: GoogleCalendarHandler = calendar_handler_factory(
+        "google"
+    )
+    test_db_handler: MongoDbHandler = db_handler_factory("mongo")
 
-test = SyncProcessor(calendar_handler, db_handler)
-test.sync()
+    test_sync_processor: SyncProcessor = SyncProcessor(
+        test_calendar_handler, test_db_handler
+    )
+    test_sync_processor.sync()

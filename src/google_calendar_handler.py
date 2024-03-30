@@ -1,15 +1,14 @@
 """This module handles requests to the Google Calendar API."""
 
-from typing import Optional
 from datetime import datetime, timedelta
 from os.path import exists
-from googleapiclient.discovery import build
+from typing import Optional
+from calendar_handler import CalendarHandler
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from calendar_handler import CalendarHandler
 from googleapiclient.http import BatchHttpRequest
 
 
