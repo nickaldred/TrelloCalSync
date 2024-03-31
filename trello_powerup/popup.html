@@ -1,10 +1,17 @@
 <div id="myPopup"> 
-    <h2>Enter Date and Time</h2>
-    <label for="dateInput">Date (YYYY-MM-DD):</label>
-    <input type="date" id="dateInput"><br><br>
+    <h2>Enter Start and End</h2>
   
-    <label for="timeInput">Time (HH:MM):</label>
-    <input type="time" id="timeInput"><br><br>
+    <label for="startDateInput">Start Date (YYYY-MM-DD):</label>
+    <input type="date" id="startDateInput"><br><br>
+  
+    <label for="startTimeInput">Start Time (HH:MM):</label>
+    <input type="time" id="startTimeInput"><br><br>
+  
+    <label for="endDateInput">End Date (YYYY-MM-DD):</label>
+    <input type="date" id="endDateInput"><br><br>
+  
+    <label for="endTimeInput">End Time (HH:MM):</label>
+    <input type="time" id="endTimeInput"><br><br>
   
     <button id="submit">Submit</button>
     <button id="cancel">Cancel</button>
@@ -12,8 +19,10 @@
   
   <script>
     document.getElementById('submit').addEventListener('click', function() {
-      Trello.set('overlay', 'date', document.getElementById('dateInput').value);
-      Trello.set('overlay', 'time', document.getElementById('timeInput').value);
+      Trello.set('overlay', 'startDate', document.getElementById('startDateInput').value);
+      Trello.set('overlay', 'startTime', document.getElementById('startTimeInput').value);
+      Trello.set('overlay', 'endDate', document.getElementById('endDateInput').value);
+      Trello.set('overlay', 'endTime', document.getElementById('endTimeInput').value);
       Trello.closePop();
     });
   
