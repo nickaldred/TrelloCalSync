@@ -1,45 +1,49 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-  </head>
-
-  <body>
-    <script src="https://p.trellocdn.com/power-up.min.js"></script>
-    <script>
+<head>
+  <meta charset="utf-8" />
+</head>
+<body>
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script>
     TrelloPowerUp.initialize({
-        "card-buttons": function (t, options) {
-            return [
-                {
-                    icon: "https://cdn.glitch.com/7b7b3b3e-1b1b-4b3b-8b3b-3b1b7b7b3b1b/trello-icon.png",
-                    text: "Template",
-                    callback: function (t) {
-                        return t.card().then((card) => {
-                            let date = prompt("Please enter the date (YYYY-MM-DD):");
-                            let time = prompt("Please enter the time (HH:MM):");
+      "card-buttons": function (t, options) {
+        return [{
+          icon: "https://cdn.glitch.com/7b7b3b3e-1b1b-4b3b-8b3b-3b1b7b7b3b1b/trello-icon.png",
+          text: "Template",
+          callback: function (t) {
+            return t.card().then((card) => {
+              return t.popup({
+                title: 'Template', 
+                url: './popup.html', 
+                height: 200
+              }).then(function(t) {
+                return t.overlay().get('date').then(date => {
+                  return t.overlay().get('time').then(time => {
+                    let data = {
+                      date: date,
+                      time: time,
+                      card: card 
+                    };
 
-                            let data = {
-                                date: date,
-                                time: time,
-                                card: card
-                            };
-
-                            fetch('https://your-url.com', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(data),
-                            })
-                            .then(response => response.json())
-                            .then(data => console.log('Success:', data))
-                            .catch((error) => console.error('Error:', error));
-                        });
-                    },
-                },
-            ];
-        },
-      });
-    </script>
-  </body>
+                    fetch('https://your-url.com', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify(data),
+                    })
+                    .then(response => response.json())
+                    .then(data => console.log('Success:', data))
+                    .catch((error) => console.error('Error:', error));
+                  });
+                });
+              });
+            });
+          }
+        }];
+      },
+    });
+  </script>
+</body>
 </html>
