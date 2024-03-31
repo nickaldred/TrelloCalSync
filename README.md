@@ -25,6 +25,16 @@ This project is a calendar synchronization service that synchronizes events betw
 3. Copy `.env.template` to `.env` and fill in your environment variables.
 4. Run the application: `python src/cal_sync_api.py`.
 
+## Expose API
+
+To expose the API, follow these steps:
+
+1. Install Tailscale.
+2. Set up Tailscale.
+3. expose the API by running the following commands:
+    - Generate a certificate: `tailscale cert {domain-name}`
+    - Funnel the API port: `tailscale funnel --bg {api-port}`
+
 ## Usage
 
 The API has the following endpoints:
