@@ -10,11 +10,11 @@
       "card-buttons": function (t, options) {
         return [{
           icon: "https://cdn.glitch.com/7b7b3b3e-1b1b-4b3b-8b3b-3b1b7b7b3b1b/trello-icon.png",
-          text: "Template",
+          text: "Calendar",
           callback: function (t) {
             return t.card().then((card) => {
               return t.popup({
-                title: 'Template', 
+                title: 'Calendar', 
                 url: './popup.html', 
                 height: 250 
               }).then(function(t) {
