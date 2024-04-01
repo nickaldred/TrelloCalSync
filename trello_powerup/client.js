@@ -7,18 +7,27 @@ var addToCalendar= function (t, date, duration) {
     t.card('id').then(function(card){
         t.board('id').then(function(board){
             var eventDetails = {
-                cardId: card.id,
-                boardId: board.id,
-                date: date,
-                duration: duration
+            cardId: card.id,
+            boardId: board.id,
+            start_date: date,
+            duration: duration,
             };
             var jsonString = JSON.stringify(eventDetails);
             console.log("JSON Event details: " + jsonString);
+
+            fetch("urlasdsdadsadasdasdsad", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: jsonString,
+            })
+            .then(response => response.json())
+            .then(data => console.log('Success:', data))
+            .catch((error) => console.error('Error:', error));
         });
-    });
-
-
-};
+        });
+    };
 
 var getDuration= function (t, date) {
   console.log("Getting duration for: " + date);

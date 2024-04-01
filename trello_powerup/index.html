@@ -1,55 +1,11 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-</head>
-<body>
-  <script src="https://p.trellocdn.com/power-up.min.js"></script>
-  <script>
-    TrelloPowerUp.initialize({
-      "card-buttons": function (t, options) {
-        return [{
-          icon: "https://cdn.glitch.com/7b7b3b3e-1b1b-4b3b-8b3b-3b1b7b7b3b1b/trello-icon.png",
-          text: "Calendar",
-          callback: function (t) {
-            return t.card().then((card) => {
-              return t.popup({
-                title: 'Calendar', 
-                url: './popup.html', 
-                height: 250 
-              }).then(function(t) {
-                return t.overlay().get('startDate').then(startDate => {
-                  return t.overlay().get('startTime').then(startTime => {
-                    return t.overlay().get('endDate').then(endDate => {
-                      return t.overlay().get('endTime').then(endTime => {
-                        let data = {
-                          startDate: startDate,
-                          startTime: startTime,
-                          endDate: endDate,
-                          endTime: endTime,
-                          card: card 
-                        };
-
-                        fetch('https://your-url.com', {
-                          method: 'POST',
-                          headers: {
-                              'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify(data),
-                        })
-                        .then(response => response.json())
-                        .then(data => console.log('Success:', data))
-                        .catch((error) => console.error('Error:', error));
-                      });
-                    });
-                  });
-                });
-              });
-            });
-          }
-        }];
-      },
-    });
-  </script>
-</body>
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+    <div id="popup-content" style="display: none;"></div>  
+    <script src="client.js"></script>
+  </body>
 </html>
