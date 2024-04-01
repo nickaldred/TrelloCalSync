@@ -1,6 +1,13 @@
 var GRAY_ICON =
   "https://cdn.hyperdev.com/us-east-1%3A3d31b21c-01a0-4da2-8827-4bc6e88b7618%2Ficon-gray.svg";
 
+
+/**
+ * Adds an event to the calendar.
+ * @param {Object} t - The Trello object.
+ * @param {string} date - The start date of the event.
+ * @param {number} duration - The duration of the event in minutes.
+ */
 var addToCalendar = function (t, date, duration) {
   console.log("Adding to calendar: " + date);
   console.log("Duration: " + duration);
@@ -16,7 +23,7 @@ var addToCalendar = function (t, date, duration) {
       var jsonString = JSON.stringify(eventDetails);
       console.log("JSON Event details: " + jsonString);
 
-      fetch("urlasdsdadsadasdasdsad", {
+      fetch("url-here", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -30,6 +37,13 @@ var addToCalendar = function (t, date, duration) {
   });
 };
 
+/**
+ * Retrieves the duration for a given date.
+ *
+ * @param {Object} t - The Trello object.
+ * @param {Date} date - The date for which to retrieve the duration.
+ * @returns {Promise} - A promise that resolves to the selected duration.
+ */
 var getDuration = function (t, date) {
   console.log("Getting duration for: " + date);
 
@@ -58,6 +72,11 @@ var getDuration = function (t, date) {
   });
 };
 
+/**
+ * Callback function for the button click event.
+ *
+ * @param {Object} t - The Trello object.
+ */
 var btnCallback = function (t) {
   calendar_event_details = t.popup({
     title: "Pick a date and time",
