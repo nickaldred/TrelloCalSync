@@ -3,10 +3,25 @@ var GRAY_ICON = 'https://cdn.hyperdev.com/us-east-1%3A3d31b21c-01a0-4da2-8827-4b
 var addToCalendar= function (t, date, duration) {
     console.log("Adding to calendar: " + date);
     console.log("Duration: " + duration);
+
+    t.card('id').then(function(card){
+        t.board('id').then(function(board){
+            var eventDetails = {
+                cardId: card.id,
+                boardId: board.id,
+                date: date,
+                duration: duration
+            };
+            var jsonString = JSON.stringify(eventDetails);
+            console.log("JSON Event details: " + jsonString);
+        });
+    });
+
+
 };
 
 var getDuration= function (t, date) {
-  console.log("Adding to calendar: " + date);
+  console.log("Getting duration for: " + date);
 
     return t.popup({
         title: 'Choose duration',
