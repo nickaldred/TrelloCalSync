@@ -3,6 +3,27 @@
 var GRAY_ICON =
   "https://cdn.hyperdev.com/us-east-1%3A3d31b21c-01a0-4da2-8827-4bc6e88b7618%2Ficon-gray.svg";
 
+/**
+ * Generates a JSON string representing the event details, including
+ * fetching the cardId and boardId from Trello.
+ * @param {Object} t - The Trello object.
+ * @param {string} date - The start date of the event.
+ * @param {number} duration - The duration of the event in minutes.
+ * @returns {string} JSON string representing the event details
+ */
+function generateJSON(t, date, duration) {
+  return t.card("id").then(function (card) {
+    return t.board("id").then(function (board) {
+      var eventDetails = {
+        cardId: card.id,
+        boardId: board.id,
+        start_date: date,
+        duration: duration,
+      };
+      return JSON.stringify(eventDetails);
+    });
+  });
+}
 
 /**
  * Adds an event to the calendar.
@@ -14,28 +35,20 @@ var addToCalendar = function (t, date, duration) {
   console.log("Adding to calendar: " + date);
   console.log("Duration: " + duration);
 
-  t.card("id").then(function (card) {
-    t.board("id").then(function (board) {
-      var eventDetails = {
-        cardId: card.id,
-        boardId: board.id,
-        start_date: date,
-        duration: duration,
-      };
-      var jsonString = JSON.stringify(eventDetails);
-      console.log("JSON Event details: " + jsonString);
+  // Get the JSON string directly from the generateJSON function
+  generateJSON(t, date, duration).then((jsonString) => {
+    console.log("JSON Event details: " + jsonString);
 
-      fetch("url-here", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: jsonString,
-      })
-        .then((response) => response.json())
-        .then((data) => console.log("Success:", data))
-        .catch((error) => console.error("Error:", error));
-    });
+    fetch("url_here", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: jsonString,
+    })
+      .then((response) => response.json())
+      .then((data) => console.log("Success:", data))
+      .catch((error) => console.error("Error:", error));
   });
 };
 
