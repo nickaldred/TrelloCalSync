@@ -66,6 +66,12 @@ var getDuration = function (t, date) {
     title: "Choose duration",
     items: [
       {
+        text: "30 mins",
+        callback: function (t, opts) {
+          return addToCalendar(t, date, 0.5);
+        },
+      },
+      {
         text: "1 hour",
         callback: function (t, opts) {
           return addToCalendar(t, date, 1);
@@ -75,6 +81,12 @@ var getDuration = function (t, date) {
         text: "2 hours",
         callback: function (t, opts) {
           return addToCalendar(t, date, 2);
+        },
+      },
+      {
+        text: "6 hours",
+        callback: function (t, opts) {
+          return addToCalendar(t, date, 6);
         },
       },
       {
