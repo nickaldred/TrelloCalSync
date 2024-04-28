@@ -190,8 +190,8 @@ def update_event(event_id: str, event: Event) -> dict:
         event.end_datetime,
         event.location,
         event.calendar_id,
-        event.trello_card_id,
-        event.trello_board_id,
+        event.card_id,
+        event.board_id,
         event.event_id,
     )
 
