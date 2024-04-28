@@ -12,13 +12,17 @@ var GRAY_ICON =
  * @returns {string} JSON string representing the event details
  */
 function generateJSON(t, date, duration) {
-  return t.card("id").then(function (card) {
+  date = new Date(date); // Convert date to a Date object
+
+  return t.card("id", "name", "desc").then(function (card) {
     return t.board("id").then(function (board) {
       var eventDetails = {
-        cardId: card.id,
-        boardId: board.id,
-        start_date: date,
-        duration: duration,
+        card_id: card.id,
+        board_id: board.id,
+        title: card.name,
+        description: card.desc,
+        start_datetime: date,
+        end_datetime: new Date(date.getTime() + duration * 60 * 60 * 1000)
       };
       return JSON.stringify(eventDetails);
     });
