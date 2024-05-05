@@ -1,8 +1,9 @@
 """Module for handling Trello webhook interactions."""
 
-from typing import Dict
-from requests import post, delete, Response
+from json import JSONDecodeError
+from json import loads as json_loads
 from exceptions import TrelloWebhookError
+from requests import RequestException, Response, delete, post
 
 
 class TrelloWebhookHandler:
@@ -17,35 +18,57 @@ class TrelloWebhookHandler:
         description: str,
         callback_url: str,
         model_id: str,
-    ) -> str:
+    ) -> dict:
         """
         Add a webhook to Trello.
 
         Args:
             description (str): The description of the webhook.
-            callback_url (str): The URL to receive webhook
-            notifications.
-            model_id (str): The ID of the Trello model to attach
-            the webhook to.
+            callback_url (str): The URL to receive webhook notifications.
+            model_id (str): The ID of the Trello model to attach the
+            webhook to.
+
+        Example response::
+        {
+            'id': '663752ec6367f387f418e99b',
+            'description': '65f6b9c672c8590dca310e37',
+            'idModel': '60f6b9c672c8590dca310e37',
+            'callbackURL': 'https://desktop-v4sacft.tail67257.ts.net/webhook/',
+            'active': True,
+            'consecutiveFailures': 0,
+            'firstConsecutiveFailDate': None
+        }
 
         Returns:
-            str: The response text from the API.
-
+            dict: The response from the API.
         """
-        url = f"https://api.trello.com/1/tokens/{self.token}/webhooks/"
+
+        url: str = f"https://api.trello.com/1/tokens/{self.token}/webhooks/"
         payload: dict[str, str] = {
             "key": self.api_key,
             "description": description,
             "callbackURL": callback_url,
             "idModel": model_id,
         }
-        response = post(url, json=payload, timeout=30)
-        return response
+
+        try:
+            response: Response = post(url, json=payload, timeout=30)
+
+            if response.status_code != 200:
+                raise TrelloWebhookError(
+                    f"Failed to add webhook: {response.text}"
+                )
+
+            return json_loads(response.text)
+
+        except (RequestException, JSONDecodeError) as error:
+            print(f"Error adding webhook: {error}")
+            raise TrelloWebhookError(f"Failed to add webhook: {error}")
 
     def delete_webhook(
         self,
         webhook_id: str,
-    ) -> Response:
+    ) -> bool:
         """
         Delete a webhook from Trello.
 
@@ -53,7 +76,7 @@ class TrelloWebhookHandler:
             webhook_id (str): The ID of the webhook to delete.
 
         Returns:
-            requests.Response: The response from the API.
+            bool: True if the webhook was deleted successfully.
 
         """
         url: str = (
@@ -61,11 +84,18 @@ class TrelloWebhookHandler:
             f"{webhook_id}?key={self.api_key}&token={self.token}"
         )
         headers: dict = {"Content-Type": "application/json"}
-        response = delete(url, headers=headers, timeout=30)
 
-        if response.status_code != 200:
-            raise TrelloWebhookError(
-                f"Failed to delete webhook: {response.text}"
-            )
+        try:
+            response: Response = delete(url, headers=headers, timeout=30)
 
-        return response
+            if response.status_code != 200:
+                print(f"Error deleting webhook: {response.text}")
+                raise TrelloWebhookError(
+                    f"Failed to delete webhook: {response.text}"
+                )
+
+            return True
+
+        except RequestException as error:
+            print(f"Error deleting webhook: {error}")
+            raise TrelloWebhookError(f"Failed to delete webhook: {error}")
