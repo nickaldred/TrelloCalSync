@@ -7,6 +7,7 @@ from config import Config, get_config
 from dotenv import load_dotenv
 from factorys import calendar_handler_factory, db_handler_factory
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from google_calendar_handler import GoogleCalendarHandler
 from logging_funcs import log_decorator, log_error, log_info
 from mongodb_handler import MongoDbHandler
@@ -16,6 +17,14 @@ from uvicorn import run
 load_dotenv("./.env")
 
 APP: FastAPI = FastAPI()
+APP.add_middleware(
+    CORSMiddleware,
+    allow_origins=environ["API_ORIGINS"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 CALENDAR_HANDLER: Optional[GoogleCalendarHandler] = calendar_handler_factory(
     environ.get("CALENDAR_TYPE")
 )
@@ -190,8 +199,8 @@ def update_event(event_id: str, event: Event) -> dict:
         event.end_datetime,
         event.location,
         event.calendar_id,
-        event.trello_card_id,
-        event.trello_board_id,
+        event.card_id,
+        event.board_id,
         event.event_id,
     )
 
