@@ -50,6 +50,14 @@ class Event(BaseModel):
     created_at: datetime = datetime.now()
 
 
+class WebhookRequest(BaseModel):
+    """Webhook request model."""
+
+    action: dict
+    model: dict
+    webhook: dict
+
+
 @APP.post("/add_event")
 @log_decorator
 def add_event(event: Event) -> dict:
@@ -203,6 +211,31 @@ def update_event(event_id: str, event: Event) -> dict:
         event.board_id,
         event.event_id,
     )
+
+
+@APP.head("/board_webhook/")
+async def add_board_webhook() -> dict:
+    """Set up the webhook.
+
+    Returns:
+        dict: The response.
+    """
+    log_info("Successfully set up board webhook")
+    return {"message": "Webhook received successfully"}
+
+
+@APP.post("/board_webhook/")
+async def receive_board_webhook(web_hook_request: WebhookRequest) -> dict:
+    """Receives the board webhooks.
+
+    Args:
+        web_hook_request (WebhookRequest): The webhook request.
+
+    Returns:
+        dict: The response.
+    """
+    log_info(f"Received webhook: {web_hook_request.model_dump()}")
+    return {"message": "Webhook received successfully"}
 
 
 if __name__ == "__main__":

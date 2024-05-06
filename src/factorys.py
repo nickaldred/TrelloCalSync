@@ -3,12 +3,13 @@
 from ast import literal_eval
 from os import environ
 from typing import Optional
-from logging_funcs import debug_log_decorator
 from dotenv import load_dotenv
 from exceptions import FactoryError
 from google_calendar_handler import GoogleCalendarHandler
+from logging_funcs import debug_log_decorator
 from mongodb_handler import MongoDbHandler
 from trello_handler import TrelloHandler
+from trello_webhook_handler import TrelloWebhookHandler
 
 load_dotenv("./.env")
 
@@ -75,3 +76,29 @@ def board_handler_factory(type_of_handler: str) -> Optional[TrelloHandler]:
         )
     else:
         raise FactoryError("Invalid board handler type")
+
+
+@debug_log_decorator
+def webhook_handler_factory(
+    type_of_handler: str,
+) -> Optional[TrelloWebhookHandler]:
+    """Create a webhook handler.
+
+    Args:
+        type_of_handler (str): The type of webhook handler to create.
+
+    Returns:
+        TrelloWebhookHandler: The webhook handler.
+    """
+    if type_of_handler == "trello":
+        return TrelloWebhookHandler(
+            api_key=environ["BOARD_API_KEY"],
+            token=environ["BOARD_TOKEN"],
+        )
+    else:
+        raise FactoryError("Invalid webhook handler type")
+
+
+if __name__ == "__main__":
+    handler = board_handler_factory("trello")
+    print(handler.get_all_lists("61ec0eaf3ad6121bee980f38"))
