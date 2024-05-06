@@ -7,3 +7,4 @@ token.json
 .env
 */test.py
 *.log
+test_commands.md
