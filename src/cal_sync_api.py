@@ -5,10 +5,15 @@ from os import environ
 from typing import Optional
 from config import Config, get_config
 from dotenv import load_dotenv
-from factorys import calendar_handler_factory, db_handler_factory
+from factorys import (
+    calendar_handler_factory,
+    db_handler_factory,
+    board_webhook_handler_factory,
+)
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from google_calendar_handler import GoogleCalendarHandler
+from trello_webhook_handler import TrelloWebhookHandler
 from logging_funcs import log_decorator, log_error, log_info
 from mongodb_handler import MongoDbHandler
 from pydantic import BaseModel
@@ -27,6 +32,9 @@ APP.add_middleware(
 
 CALENDAR_HANDLER: Optional[GoogleCalendarHandler] = calendar_handler_factory(
     environ.get("CALENDAR_TYPE")
+)
+BOARD_WEBHOOK_HANDLER: Optional[TrelloWebhookHandler] = (
+    board_webhook_handler_factory(environ.get("BOARD_TYPE"))
 )
 DB_HANDLER: Optional[MongoDbHandler] = db_handler_factory(
     environ.get("DB_TYPE")
@@ -70,7 +78,7 @@ def add_event(event: Event) -> dict:
         dict: The added event.
     """
 
-    if not CALENDAR_HANDLER or not DB_HANDLER:
+    if not CALENDAR_HANDLER or not DB_HANDLER or not BOARD_WEBHOOK_HANDLER:
         error_msg: str = "Calendar or database handler not found"
         log_error(error_msg, item_id=event.card_id)
         raise HTTPException(status_code=400, detail=error_msg)
@@ -87,6 +95,12 @@ def add_event(event: Event) -> dict:
     event.event_id = event_id
 
     if event_id:
+        BOARD_WEBHOOK_HANDLER.create_webhook(
+            f"card_id-{event.card_id}-cal_id-{event.calendar_id}",
+            environ["API_ENDPOINT_URL"],
+            event.card_id,
+        )
+
         db_result: bool = DB_HANDLER.add_document(
             "calendar_events", event.model_dump()
         )
