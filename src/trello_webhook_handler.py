@@ -2,11 +2,12 @@
 
 from json import JSONDecodeError
 from json import loads as json_loads
+from board_webhook_handler import BoardWebhookHandler
 from exceptions import TrelloWebhookError
 from requests import RequestException, Response, delete, post
 
 
-class TrelloWebhookHandler:
+class TrelloWebhookHandler(BoardWebhookHandler):
     """Handles all interactions with the Trello webhook API."""
 
     def __init__(self, api_key: str, token: str):
