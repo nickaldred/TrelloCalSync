@@ -6,16 +6,16 @@ from abc import ABC, abstractmethod
 class BoardWebhookHandler(ABC):
     """Abstract base class for handling webhook interactions with Trello."""
 
-    def __init__(self, api_key: str, token: str):
-        self.api_key: str = api_key
-        self.token: str = token
+    @abstractmethod
+    def __init__(self):
+        pass
 
     @abstractmethod
-    def add_webhook(
+    def create_webhook(
         self, description: str, callback_url: str, model_id: str
     ) -> dict:
         """
-        Add a webhook to Trello.
+        Create a webhook for the board.
         """
 
     @abstractmethod

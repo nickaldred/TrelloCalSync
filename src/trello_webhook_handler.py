@@ -3,7 +3,7 @@
 from json import JSONDecodeError
 from json import loads as json_loads
 from board_webhook_handler import BoardWebhookHandler
-from exceptions import TrelloWebhookError
+from exceptions import BoardWebhookError
 from requests import RequestException, Response, delete, post
 
 
@@ -14,7 +14,7 @@ class TrelloWebhookHandler(BoardWebhookHandler):
         self.api_key: str = api_key
         self.token: str = token
 
-    def add_webhook(
+    def create_webhook(
         self,
         description: str,
         callback_url: str,
@@ -56,7 +56,7 @@ class TrelloWebhookHandler(BoardWebhookHandler):
             response: Response = post(url, json=payload, timeout=30)
 
             if response.status_code != 200:
-                raise TrelloWebhookError(
+                raise BoardWebhookError(
                     f"Failed to add webhook: {response.text}"
                 )
 
@@ -64,7 +64,9 @@ class TrelloWebhookHandler(BoardWebhookHandler):
 
         except (RequestException, JSONDecodeError) as error:
             print(f"Error adding webhook: {error}")
-            raise TrelloWebhookError(f"Failed to add webhook: {error}")
+            raise BoardWebhookError(
+                f"Failed to add webhook: {error}"
+            ) from error
 
     def delete_webhook(
         self,
@@ -91,7 +93,7 @@ class TrelloWebhookHandler(BoardWebhookHandler):
 
             if response.status_code != 200:
                 print(f"Error deleting webhook: {response.text}")
-                raise TrelloWebhookError(
+                raise BoardWebhookError(
                     f"Failed to delete webhook: {response.text}"
                 )
 
@@ -99,4 +101,6 @@ class TrelloWebhookHandler(BoardWebhookHandler):
 
         except RequestException as error:
             print(f"Error deleting webhook: {error}")
-            raise TrelloWebhookError(f"Failed to delete webhook: {error}")
+            raise BoardWebhookError(
+                f"Failed to delete webhook: {error}"
+            ) from error

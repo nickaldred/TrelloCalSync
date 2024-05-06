@@ -10,6 +10,7 @@ from logging_funcs import debug_log_decorator
 from mongodb_handler import MongoDbHandler
 from trello_handler import TrelloHandler
 from trello_webhook_handler import TrelloWebhookHandler
+from google_webhook_handler import GoogleWebhookHandler
 
 load_dotenv("./.env")
 
@@ -79,7 +80,7 @@ def board_handler_factory(type_of_handler: str) -> Optional[TrelloHandler]:
 
 
 @debug_log_decorator
-def webhook_handler_factory(
+def board_webhook_handler_factory(
     type_of_handler: str,
 ) -> Optional[TrelloWebhookHandler]:
     """Create a webhook handler.
@@ -99,6 +100,33 @@ def webhook_handler_factory(
         raise FactoryError("Invalid webhook handler type")
 
 
+@debug_log_decorator
+def calendar_webhook_handler_factory(
+    type_of_handler: str,
+) -> Optional[GoogleWebhookHandler]:
+    """Create a webhook handler.
+
+    Args:
+        type_of_handler (str): The type of webhook handler to create.
+
+    Returns:
+        GoogleCalendarHandler: The webhook handler.
+    """
+    if type_of_handler == "google":
+        return GoogleWebhookHandler(
+            scopes=literal_eval(environ["CALENDAR_SCOPES"]),
+            token_file_path=environ["CALENDAR_TOKEN_FILE_PATH"],
+            service_account_file_path=environ[
+                "CALENDAR_SERVICE_ACCOUNT_FILE_PATH"
+            ],
+        )
+    else:
+        raise FactoryError("Invalid webhook handler type")
+
+
 if __name__ == "__main__":
-    handler = board_handler_factory("trello")
-    print(handler.get_all_lists("61ec0eaf3ad6121bee980f38"))
+    # handler = board_handler_factory("trello")
+    # print(handler.get_all_lists("61ec0eaf3ad6121bee980f38"))
+
+    cal_handler = calendar_handler_factory("google")
+    print(cal_handler.get_todays_events())
