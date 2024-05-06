@@ -6,7 +6,7 @@ from typing import Optional
 from config import Config, get_config
 from dotenv import load_dotenv
 from factorys import calendar_handler_factory, db_handler_factory
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from google_calendar_handler import GoogleCalendarHandler
 from logging_funcs import log_decorator, log_error, log_info
@@ -236,6 +236,45 @@ async def receive_board_webhook(web_hook_request: WebhookRequest) -> dict:
     """
     log_info(f"Received webhook: {web_hook_request.model_dump()}")
     return {"message": "Webhook received successfully"}
+
+
+@APP.post("/calendar_webhook/")
+async def receive_calendar_webhook(
+    x_goog_channel_id: str = Header(None),
+    x_goog_channel_token: str = Header(None),
+    x_goog_channel_expiration: str = Header(None),
+    x_goog_resource_id: str = Header(None),
+    x_goog_resource_uri: str = Header(None),
+    x_goog_resource_state: str = Header(None),
+    x_goog_message_number: int = Header(None),
+    content_length: int = Header(None),
+    content_type: str = Header(None),
+):
+    """Receives the calendar webhooks.
+
+    Args:
+        headers (WebhookHeaders): The webhook headers.
+        content_type (str): The content type.
+
+    Returns:
+        dict: The response.
+    """
+
+    if content_type == "application/json; utf-8":
+        # Handle JSON body here if needed
+        pass
+    else:
+        print("Received Headers:")
+        print(f"X-Goog-Channel-ID: {x_goog_channel_id}")
+        print(f"X-Goog-Channel-Token: {x_goog_channel_token}")
+        if x_goog_channel_expiration:
+            print(f"X-Goog-Channel-Expiration: {x_goog_channel_expiration}")
+        print(f"X-Goog-Resource-ID: {x_goog_resource_id}")
+        print(f"X-Goog-Resource-URI: {x_goog_resource_uri}")
+        print(f"X-Goog-Resource-State: {x_goog_resource_state}")
+        print(f"X-Goog-Message-Number: {x_goog_message_number}")
+
+    return {"message": "Notification received successfully"}
 
 
 if __name__ == "__main__":
